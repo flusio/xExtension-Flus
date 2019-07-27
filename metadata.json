@@ -1,0 +1,8 @@
+{
+  "name": "Flus",
+  "author": "Marien Fressinaud",
+  "description": "Extension to configure flus.io service",
+  "version": 0.1,
+  "entrypoint": "Flus",
+  "type": "system"
+}
