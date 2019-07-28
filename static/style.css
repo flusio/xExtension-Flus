@@ -1,0 +1,144 @@
+html {
+    font-size: 20px;
+    line-height: 1.6;
+}
+/* Typography > paragraphs */
+p.lead {
+    font-size: 1.1rem;
+}
+
+p.center {
+    text-align: center;
+}
+
+/* Typography > titles */
+h1, h2, h3 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+
+  word-wrap: break-word;
+}
+
+h1 {
+  margin-bottom: 1.75rem;
+}
+
+h1 { font-size: 2rem; line-height: 2.5rem; }
+h2 { font-size: 1.5rem; line-height: 2rem; }
+h3 { font-size: 1rem; line-height: 1.5rem; }
+
+* + h1,
+* + h2,
+* + h3 {
+  margin-top: 1.5rem;
+}
+
+/* Components > columns */
+.fl-columns {
+    display: flex;
+    margin-top: 4rem;
+
+    flex-direction: column;
+}
+
+.fl-columns > .fl-column + .fl-column {
+    margin-top: 4rem;
+}
+
+.fl-columns > .fl-column.fl-column-centered {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+}
+
+@media(min-width: 800px) {
+    .fl-columns {
+        flex-direction: row;
+    }
+
+    .fl-columns > .fl-column + .fl-column {
+        margin-top: 0rem;
+        margin-left: 2rem;
+    }
+
+    .fl-columns > .fl-column {
+        flex: 1 1 0;
+    }
+}
+
+/* Components > images */
+img.illustration {
+    border-radius: .5rem;
+    box-shadow: 0 0 3px #aaa;
+
+    filter: grayscale(1);
+    transition: filter 0.3s ease;
+}
+
+img.illustration:hover {
+    filter: grayscale(0);
+}
+
+/* Components > page */
+.fl-page {
+    max-width: 1200px;
+    margin: 2rem auto 5rem;
+    padding: 1rem;
+}
+
+.fl-page.fl-page-home .btn {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    padding: .5rem 1rem;
+
+    font-size: 1rem;
+}
+
+.fl-page.fl-page-home .logo {
+    max-width: 384px;
+}
+
+/* Components > page header */
+.fl-page-header nav {
+    display: flex;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 1rem;
+
+    align-items: baseline;
+    justify-content: space-between;
+}
+
+.fl-page-header nav .fl-page-header-brand {
+    flex: 1;
+
+    font-size: 1.4rem;
+    font-weight: bold;
+}
+.fl-page-header nav .fl-page-header-brand:hover {
+    text-decoration: none;
+}
+
+.fl-page-header nav .fl-page-header-logo {
+    max-width: 32px;
+
+    vertical-align: middle;
+}
+
+/* Components > section */
+.fl-section {
+    margin-bottom: 5rem;
+}
+.fl-section + .fl-section {
+    margin-top: 5rem;
+}
+
+/* Components > text container */
+.fl-text-container p,
+.fl-text-container ul,
+.fl-text-container ol,
+.fl-text-container h3 {
+    max-width: 30rem;
+}

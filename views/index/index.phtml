@@ -1,0 +1,142 @@
+<main class="fl-page fl-page-home">
+    <section class="fl-section fl-text-container">
+        <h1>Suivez l’actualité qui <em>vous</em> intéresse</h1>
+
+        <p class="lead">
+            Abonnez-vous aux sites et blogs que vous avez l’habitude de suivre pour
+            tous les retrouver en un seul endroit.
+        </p>
+
+        <p class="center register-login">
+            <a class="btn btn-important" href="<?= _url('auth', 'register') ?>">
+                Créer un compte
+            </a>
+
+            <br />
+
+            <a href="<?= _url('auth', 'login') ?>">Déjà un compte&nbsp;? Connectez-vous</a>
+        </p>
+    </section>
+
+    <section class="fl-section">
+        <img class="illustration" src="<?= $this->illustration_url ?>" alt="" />
+    </section>
+
+    <section class="fl-section">
+        <h2>Disposez des fonctionnalités dont vous avez besoin pour votre veille</h2>
+
+        <div class="fl-columns">
+            <div class="fl-column">
+                <h3>Abonnez-vous à n’importe quel site</h3>
+
+                <p>
+                    En se basant sur les standards <abbr title="Really Simple Syndication">RSS</abbr>
+                    et Atom, Flus vous permet de vous connecter à la très vaste
+                    majorité des sites d’actualité et des blogs existants.
+                </p>
+            </div>
+
+            <div class="fl-column">
+                <h3>Importez (et exportez) votre liste d’abonnements</h3>
+
+                <p>
+                    Si vous utilisez déjà un agrégateur d’actualité, vous
+                    pouvez générer un fichier <abbr title="Outline Processor Markup Language">OPML</abbr>
+                    et rejoindre Flus en quelques clics. Nous vous permettons
+                    également de repartir à tout moment avec vos données.
+                </p>
+            </div>
+        </div>
+
+        <div class="fl-columns">
+            <div class="fl-column">
+                <h3>Gardez une trace de ce que vous souhaitez lire</h3>
+
+                <p>
+                    En marquant comme «&nbsp;lus&nbsp;» les articles que vous venez de
+                    lire ou en les plaçant dans vos favoris pour les lire plus tard,
+                    vous ne risquez pas de passer à côté d’un article intéressant.
+            </div>
+
+            <div class="fl-column">
+                <h3>Organisez vos sources par catégories</h3>
+
+                <p>
+                    Vous pouvez ranger vos sources d’information par catégories
+                    afin de parcourir les articles par ordre thématique et
+                    retrouver vos sites préférés plus facilement.
+                </p>
+            </div>
+        </div>
+
+        <div class="fl-columns">
+            <div class="fl-column">
+                <h3>Bénéficiez d’une recherche puissante et rapide</h3>
+
+                <p>
+                    En quelques secondes, retrouvez un article par un mot dont
+                    vous vous souvenez, le nom de son auteur ou encore un tag
+                    associé. Chaque recherche peut être sauvegardée pour être
+                    réutilisée plus tard.
+                </p>
+            </div>
+
+            <div class="fl-column">
+                <h3>Partagez les articles qui vous interpellent vers vos réseaux sociaux</h3>
+
+                <p>
+                    Un article vous semble particulièrement intéressant&nbsp;? Flus
+                    vous permet de le partager à vos contacts sur Twitter, Facebook,
+                    Mastodon et bien d’autres en quelques secondes.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section class="fl-section">
+        <p class="lead center">
+            Bien entendu, <strong>rien ni personne n’observe ce que vous lisez</strong>,<br />
+            votre vie privée ne regarde que vous.
+        </p>
+    </section>
+
+    <section class="fl-section">
+        <div class="fl-columns">
+            <div class="fl-column">
+                <h2>Flus utilise FreshRSS</h2>
+
+                <p>
+                    Quoi de mieux pour avoir confiance dans le service utilisé qu’<strong>un
+                    logiciel dont le code est ouvert et amélioré par une communauté&nbsp;?</strong>
+                </p>
+
+                <p>
+                    Nous avons fait le choix d’utiliser <a href="https://freshrss.org">FreshRSS</a>
+                    qui a est une solution facile à prendre en main, solide et
+                    efficace. Sa communauté réactive est toujours à l’écoute des
+                    suggestions d’amélioration ce qui garantit des évolutions fréquentes.
+                </p>
+
+                <p>
+                    Par ailleurs,
+                    <a href="https://github.com/flusio">l’ensemble de notre code est ouvert</a>.
+                </p>
+
+                <p class="lead">
+                    Prendre un abonnement à Flus, c’est également pérenniser nos contributions
+                    à un bien commun.
+                </p>
+
+                <p class="center">
+                    <a class="btn btn-important" href="<?= _url('auth', 'register') ?>">
+                        Inscrivez-vous gratuitement
+                    </a>
+                </p>
+            </div>
+
+            <div class="fl-column fl-column-centered">
+                <img class="logo" src="<?= Minz_Url::display('/themes/icons/icon.svg') ?>" />
+            </div>
+        </div>
+    </section>
+</main>
