@@ -15,6 +15,7 @@ class FreshExtension_index_Controller extends FreshRSS_index_Controller {
         } else {
             $this->view->_layout('home');
             Minz_View::appendStyle($this->extension->getFileUrl('style.css', 'css'));
+            $this->view->registration_opened = !max_registrations_reached();
             $this->view->illustration_url = $this->extension->getFileUrl('screenshot.png', 'png');
             Minz_View::prependTitle('Suivez l’actualité qui vous intéresse' . ' · ');
         }

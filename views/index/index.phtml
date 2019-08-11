@@ -7,13 +7,19 @@
             tous les retrouver en un seul endroit.
         </p>
 
-        <p class="center register-login">
-            <a class="btn btn-important" href="<?= _url('auth', 'register') ?>">
-                Créer un compte
-            </a>
+        <?php if ($this->registration_opened) { ?>
+            <p class="center">
+                <a class="btn btn-important" href="<?= _url('auth', 'register') ?>">
+                    Créer un compte
+                </a>
+            </p>
+        <?php } else { ?>
+            <p class="center secondary">
+                Le service n’est pas encore ouvert.
+            </p>
+        <?php } ?>
 
-            <br />
-
+        <p class="center">
             <a href="<?= _url('auth', 'login') ?>">Déjà un compte&nbsp;? Connectez-vous</a>
         </p>
     </section>
@@ -127,11 +133,13 @@
                     à un bien commun.
                 </p>
 
-                <p class="center">
-                    <a class="btn btn-important" href="<?= _url('auth', 'register') ?>">
-                        Inscrivez-vous gratuitement
-                    </a>
-                </p>
+                <?php if ($this->registration_opened) { ?>
+                    <p class="center">
+                        <a class="btn btn-important" href="<?= _url('auth', 'register') ?>">
+                            Inscrivez-vous gratuitement
+                        </a>
+                    </p>
+                <?php } ?>
             </div>
 
             <div class="fl-column fl-column-centered">

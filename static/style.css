@@ -7,6 +7,10 @@ p.lead {
     font-size: 1.1rem;
 }
 
+p.secondary {
+    color: #666;
+}
+
 p.center {
     text-align: center;
 }
