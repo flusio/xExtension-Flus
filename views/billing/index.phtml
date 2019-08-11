@@ -1,5 +1,13 @@
 <?php $this->partial('aside_configure'); ?>
 
 <div class="post">
-    Hello world!
+    <h1>Facturation</h1>
+
+    <p>
+        <?php if ($this->subscription_end_at > $this->today) { ?>
+            Votre abonnement se termine <strong>le <?php echo $this->subscription_end_at_label; ?>.</strong>
+        <?php } else { ?>
+            Votre abonnement est terminé <strong>depuis le <?php echo $this->subscription_end_at_label; ?>.</strong>
+        <?php } ?>
+    </p>
 </div>
