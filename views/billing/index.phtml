@@ -4,7 +4,11 @@
     <h1>Facturation</h1>
 
     <p>
-        <?php if ($this->subscription_end_at > $this->today) { ?>
+        <?php if ($this->subscription_end_at === null) { ?>
+            Vous bénéficiez d’un <strong>abonnement gratuit</strong>, pas
+            besoin de renouveler à moins de vouloir aider le service à
+            vivre&nbsp;!
+        <?php } elseif ($this->subscription_end_at > $this->today) { ?>
             Votre abonnement se termine <strong>le <?php echo $this->subscription_end_at_label; ?>.</strong>
         <?php } else { ?>
             Votre abonnement est terminé <strong>depuis le <?php echo $this->subscription_end_at_label; ?>.</strong>

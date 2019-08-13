@@ -48,13 +48,17 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
 
             $today = time();
             $current_subscription_end_at = $billing['subscription_end_at'];
-            $base_date_renewal = max($today, $current_subscription_end_at);
 
-            $subscription_end_at = date_create()->setTimestamp($base_date_renewal);
-            date_add(
-                $subscription_end_at, date_interval_create_from_date_string($interval)
-            );
-            $billing['subscription_end_at'] = $subscription_end_at->getTimestamp();
+            // no need to renew a user with a free plan (subscription_end_at === null)
+            if ($current_subscription_end_at !== null) {
+                $base_date_renewal = max($today, $current_subscription_end_at);
+
+                $subscription_end_at = date_create()->setTimestamp($base_date_renewal);
+                date_add(
+                    $subscription_end_at, date_interval_create_from_date_string($interval)
+                );
+                $billing['subscription_end_at'] = $subscription_end_at->getTimestamp();
+            }
 
             $user_conf->billing = $billing;
             if ($user_conf->save()) {
