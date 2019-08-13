@@ -13,12 +13,24 @@
 
             <div class="group-controls">
                 <label for="month-frequency">
-                    <input type="radio" name="frequency" id="month-frequency" value="month" checked />
+                    <input
+                        type="radio"
+                        name="frequency"
+                        id="month-frequency"
+                        value="month"
+                        <?php echo $this->subscription_frequency === 'month' ? 'checked' : ''; ?>
+                    />
                     1 mois
                 </label>
 
                 <label for="year-frequency">
-                    <input type="radio" name="frequency" id="year-frequency" value="year" />
+                    <input
+                        type="radio"
+                        name="frequency"
+                        id="year-frequency"
+                        value="year"
+                        <?php echo $this->subscription_frequency === 'year' ? 'checked' : ''; ?>
+                    />
                     1 an
                 </label>
             </div>
@@ -42,7 +54,14 @@
 
             <div class="group-controls">
                 <label for="card-payment-type">
-                    <input type="radio" name="payment-type" id="card-payment-type" value="card" checked />
+                    <input
+                        type="radio"
+                        name="payment-type"
+                        id="card-payment-type"
+                        value="card"
+                        <?php echo $this->subscription_type === 'card' ? 'checked' : ''; ?>
+                    />
+
                     <img src="<?php echo $this->cb_illustration; ?>" alt="" />
                     <div class="payment-type-label">
                         Carte Bancaire
@@ -50,7 +69,14 @@
                 </label>
 
                 <label for="paypal-payment-type">
-                    <input type="radio" name="payment-type" id="paypal-payment-type" value="paypal" />
+                    <input
+                        type="radio"
+                        name="payment-type"
+                        id="paypal-payment-type"
+                        value="paypal"
+                        <?php echo $this->subscription_type === 'paypal' ? 'checked' : ''; ?>
+                    />
+
                     <img src="<?php echo $this->paypal_illustration; ?>" alt="" />
                     <div class="payment-type-label">
                         PayPal
