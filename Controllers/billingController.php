@@ -18,6 +18,15 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
         $this->view->subscription_end_at_label = timestamptodate(
             $this->view->subscription_end_at, false
         );
+
+        if ($this->view->subscription_end_at !== null) {
+            $weeks_before_soon = 2;
+            $seconds_before_soon = 60 * 60 * 24 * 7 * $weeks_before_soon;
+            $seconds_remaining = $this->view->subscription_end_at - $this->view->today;
+            $this->view->subscription_end_is_soon = $seconds_remaining <= $seconds_before_soon;
+        } else {
+            $this->view->subscription_end_is_soon = false;
+        }
     }
 
     public function renewAction() {

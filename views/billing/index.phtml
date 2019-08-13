@@ -15,7 +15,13 @@
         <?php } ?>
     </p>
 
-    <a class="btn" href="<?php echo _url('billing', 'renew'); ?>">
-        Renouveler
-    </a>
+    <?php if ($this->subscription_end_is_soon) { ?>
+        <a class="btn btn-important" href="<?php echo _url('billing', 'renew'); ?>">
+            Renouveler
+        </a>
+    <?php } else { ?>
+        <a class="btn" href="<?php echo _url('billing', 'renew'); ?>">
+            Renouveler
+        </a>
+    <?php } ?>
 </div>
