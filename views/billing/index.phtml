@@ -10,4 +10,8 @@
             Votre abonnement est terminé <strong>depuis le <?php echo $this->subscription_end_at_label; ?>.</strong>
         <?php } ?>
     </p>
+
+    <a class="btn" href="<?php echo _url('billing', 'renew'); ?>">
+        Renouveler
+    </a>
 </div>

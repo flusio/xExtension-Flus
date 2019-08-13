@@ -1,0 +1,54 @@
+/* Forms */
+.form-group.form-group-radios label {
+    display: inline-block;
+}
+.form-group.form-group-radios label + label {
+    margin-left: 1.5rem;
+}
+
+/* Billing form */
+.fl-renew-form .form-group {
+    margin-bottom: 1rem;
+}
+
+.fl-renew-form .fl-renew-form-amount .group-controls {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.fl-renew-form .fl-renew-payment-type-group .group-name {
+    margin-top: 20px;
+}
+
+.fl-renew-form .fl-renew-payment-type-group .group-controls label {
+    text-align: center;
+}
+
+.fl-renew-form .fl-renew-payment-type-group input {
+    display: none;
+}
+.fl-renew-form .fl-renew-payment-type-group input + img {
+    border: .25rem solid transparent;
+    border-radius: .25rem;
+
+    filter: grayscale(1);
+}
+.fl-renew-form .fl-renew-payment-type-group input:checked + img {
+    border-color: #0062be;
+
+    filter: grayscale(0);
+}
+
+.fl-renew-form .fl-renew-payment-type-group .payment-type-label {
+    color: #666;
+}
+.fl-renew-form .fl-renew-payment-type-group input:checked + img + .payment-type-label {
+    color: #000;
+}
+
+.fl-renew-form .btn {
+    padding: .25rem 1.5rem;
+
+    font-size: 1rem;
+}
+
