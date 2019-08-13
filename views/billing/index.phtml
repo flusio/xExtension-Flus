@@ -1,4 +1,8 @@
-<?php $this->partial('aside_configure'); ?>
+<?php
+    if (!$this->subscription_is_overdue) {
+        $this->partial('aside_configure');
+    }
+?>
 
 <div class="post">
     <h1>Facturation</h1>

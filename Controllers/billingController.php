@@ -5,6 +5,24 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
         $this->extension = Minz_ExtensionManager::findExtension('Flus');
     }
 
+    public function firstAction() {
+        $user_conf = FreshRSS_Context::$user_conf;
+        $today = time();
+        $subscription_end_at = $user_conf->billing['subscription_end_at'];
+        if ($subscription_end_at === null) {
+            // Free plan
+            $subscription_is_overdue = false;
+        } else {
+            $subscription_is_overdue = $today >= $subscription_end_at;
+        }
+
+        $this->view->subscription_is_overdue = $subscription_is_overdue;
+
+        if ($subscription_is_overdue) {
+            $this->view->_layout('simple');
+        }
+    }
+
     public function indexAction() {
         if (!FreshRSS_Auth::hasAccess()) {
             Minz_Error::error(403);
