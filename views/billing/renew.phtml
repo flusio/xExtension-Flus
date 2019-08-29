@@ -1,0 +1,104 @@
+<?php
+    if (!$this->subscription_is_overdue) {
+        $this->partial('aside_configure');
+    }
+?>
+
+<div class="post">
+    <h1>Facturation</h1>
+
+    <form class="fl-renew-form" method="POST">
+        <input type="hidden" name="_csrf" value="<?php echo FreshRSS_Auth::csrfToken(); ?>" />
+
+        <div class="form-group form-group-radios">
+            <div class="group-name">
+                Renouveler pour
+            </div>
+
+            <div class="group-controls">
+                <label for="month-frequency">
+                    <input
+                        type="radio"
+                        name="frequency"
+                        id="month-frequency"
+                        value="month"
+                        <?php echo $this->subscription_frequency === 'month' ? 'checked' : ''; ?>
+                    />
+                    1 mois
+                </label>
+
+                <label for="year-frequency">
+                    <input
+                        type="radio"
+                        name="frequency"
+                        id="year-frequency"
+                        value="year"
+                        <?php echo $this->subscription_frequency === 'year' ? 'checked' : ''; ?>
+                    />
+                    1 an
+                </label>
+            </div>
+        </div>
+
+        <div class="form-group fl-renew-form-amount">
+            <div class="group-name">
+                soit
+            </div>
+
+            <div class="group-controls">
+                <span id="renew-amount-month"><?php echo $this->month_price; ?> €</span>
+                <span id="renew-amount-year"><?php echo $this->year_price; ?> €</span>
+            </div>
+        </div>
+
+        <div class="form-group form-group-radios fl-renew-payment-type-group">
+            <div class="group-name">
+                à payer par
+            </div>
+
+            <div class="group-controls">
+                <label for="card-payment-type">
+                    <input
+                        type="radio"
+                        name="payment-type"
+                        id="card-payment-type"
+                        value="card"
+                        <?php echo $this->subscription_type === 'card' ? 'checked' : ''; ?>
+                    />
+
+                    <img src="<?php echo $this->cb_illustration; ?>" alt="" />
+                    <div class="payment-type-label">
+                        Carte Bancaire
+                    </div>
+                </label>
+
+                <label for="paypal-payment-type">
+                    <input
+                        type="radio"
+                        name="payment-type"
+                        id="paypal-payment-type"
+                        value="paypal"
+                        <?php echo $this->subscription_type === 'paypal' ? 'checked' : ''; ?>
+                    />
+
+                    <img src="<?php echo $this->paypal_illustration; ?>" alt="" />
+                    <div class="payment-type-label">
+                        PayPal
+                    </div>
+                </label>
+            </div>
+        </div>
+
+        <div class="form-group form-actions">
+            <div class="group-controls">
+                <button type="submit" class="btn btn-important">
+                    Payer
+                </button>
+
+                <a class="btn" href="<?php echo _url('billing', 'index'); ?>">
+                    Annuler
+                </a>
+            </div>
+        </div>
+    </form>
+</div>
