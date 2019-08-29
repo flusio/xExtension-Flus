@@ -103,6 +103,18 @@ img.illustration:hover {
     max-width: 384px;
 }
 
+.fl-page.fl-page-home .fl-section-freshrss {
+    margin-top: 8rem;
+    margin-bottom: 8rem;
+    padding: 2rem;
+
+    border: .25rem solid #0062be;
+    border-radius: .5rem;
+}
+.fl-page.fl-page-home .fl-section-freshrss .fl-columns {
+    margin-top: 0;
+}
+
 /* Components > page header */
 .fl-page-header nav {
     display: flex;
