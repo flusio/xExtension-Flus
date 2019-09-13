@@ -108,7 +108,7 @@ img.illustration:hover {
     margin-bottom: 8rem;
     padding: 2rem;
 
-    border: .25rem solid #0062be;
+    border: .25rem solid var(--secondary-color);
     border-radius: .5rem;
 }
 .fl-page.fl-page-home .fl-section-freshrss .fl-columns {
