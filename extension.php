@@ -9,7 +9,11 @@ class FlusExtension extends Minz_Extension {
 
     public function uninstall() {
         $cgu_path = DATA_PATH . '/tos.html';
-        return unlink($cgu_path);
+        if (file_exists($cgu_path)) {
+            return unlink($cgu_path);
+        } else {
+            return true;
+        }
     }
 
     public function init() {
