@@ -2,18 +2,35 @@
 
 class FlusExtension extends Minz_Extension {
     public function install() {
-        $cgu_initial_path = $this->getPath() . '/legals/cgu.html';
-        $cgu_destination_path = DATA_PATH . '/tos.html';
-        return copy($cgu_initial_path, $cgu_destination_path);
+        $files_to_install = array(
+            '/legals/cgu.html' => DATA_PATH . '/tos.html',
+            '/config-user.custom.php' => DATA_PATH . '/config-user.custom.php',
+        );
+
+        foreach ($files_to_install as $src_file => $dest_file) {
+            $res = copy($this->getPath() . $src_file, $dest_file);
+            if (!$res) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public function uninstall() {
-        $cgu_path = DATA_PATH . '/tos.html';
-        if (file_exists($cgu_path)) {
-            return unlink($cgu_path);
-        } else {
-            return true;
+        $files_to_unlink = array(
+            DATA_PATH . '/tos.html',
+            DATA_PATH . '/config-user.custom.php',
+        );
+
+        foreach ($files_to_unlink as $file) {
+            if (file_exists($file)) {
+                $res = unlink($file);
+                if (!$res) {
+                    return false;
+                }
+            }
         }
+        return true;
     }
 
     public function init() {
