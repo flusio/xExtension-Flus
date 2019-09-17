@@ -143,6 +143,11 @@ img.illustration:hover {
     vertical-align: middle;
 }
 
+/* Components > page footer */
+.fl-page-footer {
+    margin-bottom: 5rem;
+}
+
 /* Components > section */
 .fl-section {
     margin-bottom: 5rem;

@@ -17,7 +17,20 @@ class FreshExtension_index_Controller extends FreshRSS_index_Controller {
             Minz_View::appendStyle($this->extension->getFileUrl('home.css', 'css'));
             $this->view->registration_opened = !max_registrations_reached();
             $this->view->illustration_url = $this->extension->getFileUrl('screenshot.png', 'png');
-            Minz_View::prependTitle('Suivez l’actualité qui vous intéresse' . ' · ');
+            Minz_View::prependTitle('Suivez l’actualité qui vous intéresse · ');
         }
+    }
+
+    public function aboutAction() {
+        $this->view->about = file_get_contents($this->extension->getPath() . '/legals/about.html');
+        $this->view->can_register = !max_registrations_reached();
+        Minz_View::prependTitle(_t('index.about.title') . ' · ');
+    }
+
+    public function cgvAction() {
+        $this->view->cgv = file_get_contents($this->extension->getPath() . '/legals/cgv.html');
+        $this->view->is_connected = FreshRSS_Auth::hasAccess();
+        $this->view->can_register = !max_registrations_reached();
+        Minz_View::prependTitle('Conditions Générales de Vente · ');
     }
 }

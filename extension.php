@@ -1,6 +1,17 @@
 <?php
 
 class FlusExtension extends Minz_Extension {
+    public function install() {
+        $cgu_initial_path = $this->getPath() . '/legals/cgu.html';
+        $cgu_destination_path = DATA_PATH . '/tos.html';
+        return copy($cgu_initial_path, $cgu_destination_path);
+    }
+
+    public function uninstall() {
+        $cgu_path = DATA_PATH . '/tos.html';
+        return unlink($cgu_path);
+    }
+
     public function init() {
         Minz_View::appendStyle($this->getFileUrl('style.css', 'css'));
         Minz_View::appendScript($this->getFileUrl('script.js', 'js'));
