@@ -6,6 +6,18 @@
     margin-left: 1.5rem;
 }
 
+/* Address form */
+.fl-address-form .form-group {
+    margin-bottom: .5rem;
+}
+
+.fl-address-form input.short {
+    width: 90px;
+}
+.fl-address-form input.medium {
+    width: 206px;
+}
+
 /* Billing form */
 .fl-renew-form .form-group {
     margin-bottom: 1rem;

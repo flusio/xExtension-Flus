@@ -58,12 +58,20 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
         $user_conf = FreshRSS_Context::$user_conf;
         $billing = $user_conf->billing;
 
+        if (!array_key_exists('address', $billing)) {
+            Minz_Request::forward(array(
+                'c' => 'billing',
+                'a' => 'address',
+            ), true);
+        }
+
         $this->view->paypal_illustration = $this->extension->getFileUrl('paypal.jpg', 'jpg');
         $this->view->cb_illustration = $this->extension->getFileUrl('cb.jpg', 'jpg');
         $this->view->month_price = $system_conf->billing['month_price'];
         $this->view->year_price = $system_conf->billing['year_price'];
         $this->view->subscription_frequency = $billing['subscription_frequency'];
         $this->view->subscription_type = $billing['subscription_type'];
+        $this->view->address = $billing['address'];
 
         if (Minz_Request::isPost()) {
             // @todo this should be handled on payment service callback
@@ -113,5 +121,79 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
                 ));
             }
         }
+    }
+
+    public function addressAction() {
+        if (!FreshRSS_Auth::hasAccess()) {
+            Minz_Error::error(403);
+        }
+
+        Minz_View::prependTitle('Adresse de facturation · ');
+
+        $user_conf = FreshRSS_Context::$user_conf;
+        $billing = $user_conf->billing;
+
+        $first_name = '';
+        $last_name = '';
+        $address = '';
+        $postcode = '';
+        $city = '';
+
+        $address_missing = !array_key_exists('address', $billing);
+        if (!$address_missing) {
+            $first_name = $billing['address']['first_name'];
+            $last_name = $billing['address']['last_name'];
+            $address = $billing['address']['address'];
+            $postcode = $billing['address']['postcode'];
+            $city = $billing['address']['city'];
+        }
+
+        if (Minz_Request::isPost()) {
+            $first_name = Minz_Helper::htmlspecialchars_utf8(trim(Minz_Request::param('first_name', '')));
+            $last_name = Minz_Helper::htmlspecialchars_utf8(trim(Minz_Request::param('last_name', '')));
+            $address = Minz_Helper::htmlspecialchars_utf8(trim(Minz_Request::param('address', '')));
+            $postcode = Minz_Helper::htmlspecialchars_utf8(trim(Minz_Request::param('postcode', '')));
+            $city = Minz_Helper::htmlspecialchars_utf8(trim(Minz_Request::param('city', '')));
+
+            if (
+                $first_name != '' &&
+                $last_name != '' &&
+                $address != '' &&
+                $postcode != '' &&
+                $city != ''
+            ) {
+                $billing['address'] = array(
+                    'first_name' => $first_name,
+                    'last_name' => $last_name,
+                    'address' => $address,
+                    'postcode' => $postcode,
+                    'city' => $city,
+                );
+                $user_conf->billing = $billing;
+                if ($user_conf->save()) {
+                    Minz_Request::good('Votre adresse a été enregistrée.', array(
+                        'c' => 'billing',
+                        'a' => 'renew',
+                    ));
+                } else {
+                    Minz_Request::bad('Nous n’avons pas pu enregistrer votre adresse.', array(
+                        'c' => 'billing',
+                        'a' => 'address',
+                    ));
+                }
+            } else {
+                Minz_Request::bad('Tous les champs sont requis.', array(
+                    'c' => 'billing',
+                    'a' => 'address',
+                ));
+            }
+        }
+
+        $this->view->address_missing = $address_missing;
+        $this->view->first_name = $first_name;
+        $this->view->last_name = $last_name;
+        $this->view->address = $address;
+        $this->view->postcode = $postcode;
+        $this->view->city = $city;
     }
 }

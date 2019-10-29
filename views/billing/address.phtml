@@ -1,0 +1,117 @@
+<?php
+    if (!$this->subscription_is_overdue) {
+        $this->partial('aside_configure');
+    }
+?>
+
+<div class="post">
+    <h1>Adresse de facturation</h1>
+
+    <?php if ($this->address_missing) { ?>
+        <p class="alert alert-warn">
+            Nous avons besoin d’une adresse de facturation pour pouvoir éditer
+            des factures de manière légale. Vous pouvez vous référer
+            <a href="<?= _url('index', 'about') ?>">aux mentions légales</a>
+            pour savoir comment nous gérons vos données.
+        </p>
+    <?php } ?>
+
+    <form class="fl-address-form" method="POST">
+        <input type="hidden" name="_csrf" value="<?php echo FreshRSS_Auth::csrfToken(); ?>" />
+
+        <div class="form-group">
+            <label class="group-name" for="first_name">
+                Prénom et nom
+            </label>
+
+            <div class="group-controls">
+                <input
+                    type="text"
+                    name="first_name"
+                    id="first_name"
+                    placeholder="Camille"
+                    required
+                    value="<?= $this->first_name ?>"
+                />
+
+                <input
+                    type="text"
+                    name="last_name"
+                    id="last_name"
+                    placeholder="Dupuis-Morizeau"
+                    required
+                    value="<?= $this->last_name ?>"
+                />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="group-name" for="address">
+                Adresse
+            </label>
+
+            <div class="group-controls">
+                <input
+                    type="text"
+                    name="address"
+                    id="address"
+                    class="long"
+                    placeholder="2 Rue du Château"
+                    required
+                    value="<?= $this->address ?>"
+                />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="group-name" for="postcode">
+                Code postal et ville
+            </label>
+
+            <div class="group-controls">
+                <input
+                    type="text"
+                    name="postcode"
+                    id="postcode"
+                    class="short"
+                    placeholder="23000"
+                    pattern="[0-9]{5}"
+                    required
+                    value="<?= $this->postcode ?>"
+                />
+
+                <input
+                    type="text"
+                    name="city"
+                    id="city"
+                    class="medium"
+                    placeholder="Guéret"
+                    required
+                    value="<?= $this->city ?>"
+                />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="group-controls">
+                <p>
+                    <strong>France</strong>
+                    <small>(vous habitez ailleurs&nbsp;?
+                    <a href="mailto:support@flus.io">Contactez-nous</a>)</small>
+                </p>
+            </div>
+        </div>
+
+        <div class="form-group form-actions">
+            <div class="group-controls">
+                <button type="submit" class="btn btn-important">
+                    Enregistrer l’adresse
+                </button>
+
+                <a class="btn" href="<?php echo _url('billing', 'index'); ?>">
+                    Annuler
+                </a>
+            </div>
+        </div>
+    </form>
+</div>

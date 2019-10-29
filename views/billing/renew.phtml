@@ -95,6 +95,22 @@
         <div class="form-group">
             <div class="group-controls">
                 <p>
+                    Vous serez facturé à l’adresse suivante&nbsp;:
+                </p>
+
+                <address>
+                    <?= $this->address['first_name'] . ' ' . $this->address['last_name'] ?><br />
+                    <?= $this->address['address'] ?><br />
+                    <?= $this->address['postcode'] . ' ' . $this->address['city'] ?>
+                </address>
+
+                <a href="<?= _url('billing', 'address') ?>">Modifier</a>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="group-controls">
+                <p>
                     En validant ce formulaire, vous acceptez les
                     <a href="?a=cgv">Conditions Générales de Vente</a>
                     (<abbr>CGV</abbr>) du site.
