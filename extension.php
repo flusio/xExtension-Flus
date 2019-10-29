@@ -100,6 +100,9 @@ class FlusExtension extends Minz_Extension {
 
         $subscription_is_overdue = $today >= $subscription_end_at;
         $action_is_allowed = (
+            Minz_Request::is('index', 'about') ||
+            Minz_Request::is('index', 'tos') ||
+            Minz_Request::is('index', 'cgv') ||
             Minz_Request::is('auth', 'logout') ||
             Minz_Request::is('billing', 'index') ||
             Minz_Request::is('billing', 'renew')
