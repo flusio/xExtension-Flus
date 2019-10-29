@@ -72,9 +72,9 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
                 $frequency = 'month';
             }
             $payment_type = Minz_Request::param('payment-type', 'card');
-            if ($payment_type !== 'card' && $payment_type !== 'paypal') {
+            //if ($payment_type !== 'card' && $payment_type !== 'paypal') {
                 $payment_type = 'card';
-            }
+            //}
 
             if ($frequency === 'year') {
                 $interval = '1 year';
