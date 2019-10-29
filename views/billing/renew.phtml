@@ -46,8 +46,9 @@
             </div>
 
             <div class="group-controls">
-                <span id="renew-amount-month"><?php echo $this->month_price; ?> €</span>
-                <span id="renew-amount-year"><?php echo $this->year_price; ?> €</span>
+                <strong id="renew-amount-month"><?php echo $this->month_price; ?> €</strong>
+                <strong id="renew-amount-year"><?php echo $this->year_price; ?> €</strong>
+                à payer
             </div>
         </div>
 
@@ -104,7 +105,7 @@
         <div class="form-group form-actions">
             <div class="group-controls">
                 <button type="submit" class="btn btn-important">
-                    Payer
+                    Payer l’abonnement
                 </button>
 
                 <a class="btn" href="<?php echo _url('billing', 'index'); ?>">
