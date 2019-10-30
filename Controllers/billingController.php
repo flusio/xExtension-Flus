@@ -168,6 +168,7 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
                     'address' => $address,
                     'postcode' => $postcode,
                     'city' => $city,
+                    'country' => 'FR',
                 );
                 $user_conf->billing = $billing;
                 if ($user_conf->save()) {
