@@ -1,5 +1,7 @@
 <?php
 
+use \Flus\services\Payplug;
+
 class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
     public function init() {
         $this->extension = Minz_ExtensionManager::findExtension('Flus');
@@ -74,7 +76,6 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
         $this->view->address = $billing['address'];
 
         if (Minz_Request::isPost()) {
-            // @todo this should be handled on payment service callback
             $frequency = Minz_Request::param('frequency', 'month');
             if ($frequency !== 'month' && $frequency !== 'year') {
                 $frequency = 'month';
@@ -84,43 +85,45 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
                 $payment_type = 'card';
             //}
 
-            if ($frequency === 'year') {
-                $interval = '1 year';
-            } else {
-                $interval = '1 month';
-            }
-
-            $today = time();
-            $current_subscription_end_at = $billing['subscription_end_at'];
-
-            // no need to renew a user with a free plan (subscription_end_at === null)
-            if ($current_subscription_end_at !== null) {
-                $base_date_renewal = max($today, $current_subscription_end_at);
-
-                $subscription_end_at = date_create()->setTimestamp($base_date_renewal);
-                date_add(
-                    $subscription_end_at, date_interval_create_from_date_string($interval)
-                );
-                $billing['subscription_end_at'] = $subscription_end_at->getTimestamp();
-            }
-
+            // Save prefered options for the next time
             $billing['subscription_frequency'] = $frequency;
             $billing['subscription_type'] = $payment_type;
-
             $user_conf->billing = $billing;
-            if ($user_conf->save()) {
-                Minz_Request::good('Vous avez renouvelé votre abonnement.', array(
-                    'c' => 'billing',
-                    'a' => 'index',
-                ));
+            $user_conf->save();
+
+            if ($frequency === 'month') {
+                $amount = $this->view->month_price;
             } else {
-                $error = 'Un problème est survenu lors de l’enregistrement du paiement.';
-                Minz_Request::bad($error, array(
-                    'c' => 'billing',
-                    'a' => 'index',
-                ));
+                $amount = $this->view->year_price;
             }
+
+            $username = Minz_Session::param('currentUser', '_');
+
+            Payplug::init(
+                $system_conf->billing['payplug_secret_key'],
+                $system_conf->billing['payplug_api_version']
+            );
+            $payment_service = Payplug::create($username, $frequency, $amount);
+            $payment_service->syncStatus();
+            $payment_service->save();
+            $payment_service->pay();
         }
+    }
+
+    public function returnAction() {
+        if (!FreshRSS_Auth::hasAccess()) {
+            Minz_Error::error(403);
+        }
+
+        Minz_View::prependTitle('Prise en compte du paiement · ');
+    }
+
+    public function cancelAction() {
+        if (!FreshRSS_Auth::hasAccess()) {
+            Minz_Error::error(403);
+        }
+
+        Minz_View::prependTitle('Annulation du paiement · ');
     }
 
     public function addressAction() {
