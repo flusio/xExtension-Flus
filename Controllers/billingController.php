@@ -33,6 +33,15 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
         Minz_View::prependTitle('Facturation · ');
 
         $user_conf = FreshRSS_Context::$user_conf;
+        $payments = $user_conf->billing['payments'];
+        uasort(
+            $payments,
+            function ($payment1, $payment2) {
+                return $payment2['date'] - $payment1['date'];
+            }
+        );
+
+        $this->view->payments = $payments;
         $this->view->today = time();
         $this->view->subscription_end_at = $user_conf->billing['subscription_end_at'];
         $this->view->subscription_end_at_label = timestamptodate(

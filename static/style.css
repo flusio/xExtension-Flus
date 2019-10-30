@@ -64,3 +64,13 @@
     font-size: 1rem;
 }
 
+/* Payments table */
+.fl-payments-table th,
+.fl-payments-table td {
+    padding-left: 3rem;
+    padding-right: 3rem;
+}
+.fl-payments-table th:first-child,
+.fl-payments-table td:first-child {
+    padding-left: 1rem;
+}
