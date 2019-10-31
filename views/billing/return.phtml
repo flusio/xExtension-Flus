@@ -1,0 +1,48 @@
+<?php
+    if (!$this->subscription_is_overdue) {
+        $this->partial('aside_configure');
+    }
+?>
+
+<div class="post">
+    <?php if ($this->payment['status'] === 'paid') { ?>
+        <h1>Validation du paiement</h1>
+
+        <p>
+            Votre paiement a été validé par PayPlug et nous vous en remercions.
+            Votre abonnement a par conséquent été prolongé
+            <?= $this->payment['frequency'] === 'month' ? 'd’un mois.' : 'd’une année.' ?>
+        </p>
+
+    <?php } elseif ($this->payment['status'] === 'canceled') { ?>
+        <h1>Annulation du paiement</h1>
+
+        <p>
+            Le paiement a été annulé, il ne vous sera rien débité.
+        </p>
+
+    <?php } elseif ($this->payment['status'] === 'waiting') { ?>
+        <h1>Prise en compte du paiement</h1>
+
+        <p>
+            Votre paiement a été pris en compte, mais nous attendons la
+            confirmation que celui-ci s’est bien passé.
+        </p>
+
+        <p>
+            <a class="btn" href="<?= _url('billing', 'return') ?>">Rafraîchir la page</a>
+        </p>
+
+    <?php } else { ?>
+        <h1>Erreur de paiement</h1>
+
+        <p>
+            Une erreur est survenue lors du paiement, nous n’avons pas pu
+            valider votre commande. Il ne vous sera donc rien débité.
+        </p>
+    <?php } ?>
+
+    <p>
+        <a href="<?= _url('billing', 'index') ?>">← Retour à la facturation</a>
+    </p>
+</div>

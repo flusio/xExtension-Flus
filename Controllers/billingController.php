@@ -1,5 +1,7 @@
 <?php
 
+use \Flus\services\Payplug;
+
 class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
     public function init() {
         $this->extension = Minz_ExtensionManager::findExtension('Flus');
@@ -7,8 +9,10 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
 
     public function firstAction() {
         $user_conf = FreshRSS_Context::$user_conf;
+        $billing = $user_conf->billing;
+
         $today = time();
-        $subscription_end_at = $user_conf->billing['subscription_end_at'];
+        $subscription_end_at = $billing['subscription_end_at'];
         if ($subscription_end_at === null) {
             // Free plan
             $subscription_is_overdue = false;
@@ -21,6 +25,15 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
         if ($subscription_is_overdue) {
             $this->view->_layout('simple');
         }
+
+        $waiting_payment_id = null;
+        foreach ($billing['payments'] as $id => $payment) {
+            if ($payment['status'] === 'waiting') {
+                $waiting_payment_id = $id;
+                break;
+            }
+        }
+        $this->view->waiting_payment_id = $waiting_payment_id;
     }
 
     public function indexAction() {
@@ -31,6 +44,15 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
         Minz_View::prependTitle('Facturation · ');
 
         $user_conf = FreshRSS_Context::$user_conf;
+        $payments = $user_conf->billing['payments'];
+        uasort(
+            $payments,
+            function ($payment1, $payment2) {
+                return $payment2['date'] - $payment1['date'];
+            }
+        );
+
+        $this->view->payments = $payments;
         $this->view->today = time();
         $this->view->subscription_end_at = $user_conf->billing['subscription_end_at'];
         $this->view->subscription_end_at_label = timestamptodate(
@@ -50,6 +72,13 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
     public function renewAction() {
         if (!FreshRSS_Auth::hasAccess()) {
             Minz_Error::error(403);
+        }
+
+        if ($this->view->waiting_payment_id !== null) {
+            Minz_Request::forward(array(
+                'c' => 'billing',
+                'a' => 'index',
+            ), true);
         }
 
         Minz_View::prependTitle('Facturation · ');
@@ -74,7 +103,6 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
         $this->view->address = $billing['address'];
 
         if (Minz_Request::isPost()) {
-            // @todo this should be handled on payment service callback
             $frequency = Minz_Request::param('frequency', 'month');
             if ($frequency !== 'month' && $frequency !== 'year') {
                 $frequency = 'month';
@@ -84,48 +112,77 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
                 $payment_type = 'card';
             //}
 
-            if ($frequency === 'year') {
-                $interval = '1 year';
-            } else {
-                $interval = '1 month';
-            }
-
-            $today = time();
-            $current_subscription_end_at = $billing['subscription_end_at'];
-
-            // no need to renew a user with a free plan (subscription_end_at === null)
-            if ($current_subscription_end_at !== null) {
-                $base_date_renewal = max($today, $current_subscription_end_at);
-
-                $subscription_end_at = date_create()->setTimestamp($base_date_renewal);
-                date_add(
-                    $subscription_end_at, date_interval_create_from_date_string($interval)
-                );
-                $billing['subscription_end_at'] = $subscription_end_at->getTimestamp();
-            }
-
+            // Save prefered options for the next time
             $billing['subscription_frequency'] = $frequency;
             $billing['subscription_type'] = $payment_type;
-
             $user_conf->billing = $billing;
-            if ($user_conf->save()) {
-                Minz_Request::good('Vous avez renouvelé votre abonnement.', array(
-                    'c' => 'billing',
-                    'a' => 'index',
-                ));
+            $user_conf->save();
+
+            if ($frequency === 'month') {
+                $amount = $this->view->month_price;
             } else {
-                $error = 'Un problème est survenu lors de l’enregistrement du paiement.';
-                Minz_Request::bad($error, array(
-                    'c' => 'billing',
-                    'a' => 'index',
-                ));
+                $amount = $this->view->year_price;
             }
+
+            $username = Minz_Session::param('currentUser', '_');
+
+            Payplug::init(
+                $system_conf->billing['payplug_secret_key'],
+                $system_conf->billing['payplug_api_version']
+            );
+            $payment_service = Payplug::create($username, $frequency, $amount);
+            $payment_service->syncStatus();
+            $payment_service->save();
+            $payment_service->pay();
         }
+    }
+
+    public function returnAction() {
+        if (!FreshRSS_Auth::hasAccess()) {
+            Minz_Error::error(403);
+        }
+
+        invalidateHttpCache();
+
+        $waiting_payment_id = $this->view->waiting_payment_id;
+        if ($waiting_payment_id === null) {
+            Minz_Request::forward(array(
+                'c' => 'billing',
+                'a' => 'index',
+            ), true);
+        }
+
+        $payment_service = $this->acknowledgeWaitingPayment($waiting_payment_id);
+
+        if ($payment_service->isPaid()) {
+            $username = $payment_service->username();
+            $frequency = $payment_service->frequency();
+            $this->approvePayment($username, $frequency);
+        }
+
+        if ($payment_service->isPaid()) {
+            Minz_View::prependTitle('Validation du paiement · ');
+        } elseif ($payment_service->isCanceled()) {
+            Minz_View::prependTitle('Annulation du paiement · ');
+        } elseif ($payment_service->isWaiting()) {
+            Minz_View::prependTitle('Prise en compte du paiement · ');
+        } else {
+            Minz_View::prependTitle('Échec du paiement · ');
+        }
+
+        $this->view->payment = $payment_service->payment();
     }
 
     public function addressAction() {
         if (!FreshRSS_Auth::hasAccess()) {
             Minz_Error::error(403);
+        }
+
+        if ($this->view->waiting_payment_id !== null) {
+            Minz_Request::forward(array(
+                'c' => 'billing',
+                'a' => 'index',
+            ), true);
         }
 
         Minz_View::prependTitle('Adresse de facturation · ');
@@ -196,5 +253,44 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
         $this->view->address = $address;
         $this->view->postcode = $postcode;
         $this->view->city = $city;
+    }
+
+    private function acknowledgeWaitingPayment($waiting_payment_id) {
+        $system_conf = FreshRSS_Context::$system_conf;
+        Payplug::init(
+            $system_conf->billing['payplug_secret_key'],
+            $system_conf->billing['payplug_api_version']
+        );
+        $payment_service = Payplug::retrieve($waiting_payment_id);
+        $payment_service->syncStatus();
+        $payment_service->save();
+        return $payment_service;
+    }
+
+    private function approvePayment($username, $frequency) {
+        $user_conf = get_user_configuration($username);
+        $billing = $user_conf->billing;
+        $current_subscription_end_at = $billing['subscription_end_at'];
+
+        // no need to renew a user with a free plan (subscription_end_at === null)
+        if ($current_subscription_end_at !== null) {
+            if ($frequency === 'year') {
+                $interval = '1 year';
+            } else {
+                $interval = '1 month';
+            }
+
+            $today = time();
+            $base_date_renewal = max($today, $current_subscription_end_at);
+
+            $subscription_end_at = date_create()->setTimestamp($base_date_renewal);
+            date_add(
+                $subscription_end_at, date_interval_create_from_date_string($interval)
+            );
+            $billing['subscription_end_at'] = $subscription_end_at->getTimestamp();
+        }
+
+        $user_conf->billing = $billing;
+        return $user_conf->save();
     }
 }

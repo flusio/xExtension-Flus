@@ -19,7 +19,11 @@
         <?php } ?>
     </p>
 
-    <?php if ($this->subscription_end_is_soon) { ?>
+    <?php if ($this->waiting_payment_id) { ?>
+        <a class="btn btn-important" href="<?= _url('billing', 'return') ?>">
+            Vérifier l’état de votre paiement en attente
+        </a>
+    <?php } elseif ($this->subscription_end_is_soon) { ?>
         <a class="btn btn-important" href="<?php echo _url('billing', 'renew'); ?>">
             Renouveler
         </a>
@@ -27,5 +31,69 @@
         <a class="btn" href="<?php echo _url('billing', 'renew'); ?>">
             Renouveler
         </a>
+    <?php } ?>
+
+    <?php if (!empty($this->payments)) { ?>
+        <h2>Historique des paiements</h2>
+
+        <table class="fl-payments-table">
+            <thead>
+                <tr>
+                    <th class="date">Date</th>
+                    <th class="frequency">Période</th>
+                    <th class="amount">Prix</th>
+                    <th class="status">État</th>
+                </th>
+            </thead>
+
+            <tbody>
+                <?php foreach ($this->payments as $payment) { ?>
+                    <tr>
+                        <td><?= timestamptodate($payment['date']) ?></td>
+                        <td>
+                            <?php if ($payment['frequency'] === 'month') { ?>
+                                1 mois
+                            <?php } else { ?>
+                                1 an
+                            <?php } ?>
+                        </td>
+                        <td class="numeric"><?= $payment['amount'] ?>&nbsp;€</td>
+                        <td>
+                            <?php if ($payment['status'] === 'waiting') { ?>
+                                <strong>en attente</strong>
+                            <?php } elseif ($payment['status'] === 'paid') { ?>
+                                payé ✔
+                            <?php } elseif ($payment['status'] === 'canceled') { ?>
+                                annulé
+                            <?php } elseif ($payment['status'] === 'card_declined') { ?>
+                                carte déclinée
+                            <?php } elseif ($payment['status'] === 'processing_error') { ?>
+                                erreur de traitement
+                            <?php } elseif ($payment['status'] === 'insufficient_funds') { ?>
+                                fonds insuffisants
+                            <?php } elseif ($payment['status'] === '3ds_declined') { ?>
+                                3D-Secure décliné
+                            <?php } elseif ($payment['status'] === 'incorrect_number') { ?>
+                                numéro incorrect
+                            <?php } elseif ($payment['status'] === 'fraud_suspected') { ?>
+                                fraude suspectée
+                            <?php } elseif ($payment['status'] === 'method_unsupported') { ?>
+                                carte non supportée
+                            <?php } elseif ($payment['status'] === 'card_scheme_mismatch') { ?>
+                                carte incohérente
+                            <?php } elseif ($payment['status'] === 'card_expiration_date_prior_to_last_installment_date') { ?>
+                                carte expirée
+                            <?php } elseif ($payment['status'] === 'aborted') { ?>
+                                interrompu
+                            <?php } elseif ($payment['status'] === 'timeout') { ?>
+                                délai dépassé
+                            <?php } else { ?>
+                                <?= $payment['status'] ?>
+                            <?php } ?>
+                        </td>
+                    </tr>
+                <?php } ?>
+            </tbody>
+        </table>
     <?php } ?>
 </div>
