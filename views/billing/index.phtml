@@ -19,7 +19,11 @@
         <?php } ?>
     </p>
 
-    <?php if ($this->subscription_end_is_soon) { ?>
+    <?php if ($this->waiting_payment_id) { ?>
+        <a class="btn btn-important" href="<?= _url('billing', 'return') ?>">
+            Vérifier l’état de votre paiement en attente
+        </a>
+    <?php } elseif ($this->subscription_end_is_soon) { ?>
         <a class="btn btn-important" href="<?php echo _url('billing', 'renew'); ?>">
             Renouveler
         </a>
