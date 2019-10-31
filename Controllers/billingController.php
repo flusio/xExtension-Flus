@@ -9,8 +9,10 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
 
     public function firstAction() {
         $user_conf = FreshRSS_Context::$user_conf;
+        $billing = $user_conf->billing;
+
         $today = time();
-        $subscription_end_at = $user_conf->billing['subscription_end_at'];
+        $subscription_end_at = $billing['subscription_end_at'];
         if ($subscription_end_at === null) {
             // Free plan
             $subscription_is_overdue = false;
@@ -23,6 +25,15 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
         if ($subscription_is_overdue) {
             $this->view->_layout('simple');
         }
+
+        $waiting_payment_id = null;
+        foreach ($billing['payments'] as $id => $payment) {
+            if ($payment['status'] === 'waiting') {
+                $waiting_payment_id = $id;
+                break;
+            }
+        }
+        $this->view->waiting_payment_id = $waiting_payment_id;
     }
 
     public function indexAction() {
@@ -61,6 +72,13 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
     public function renewAction() {
         if (!FreshRSS_Auth::hasAccess()) {
             Minz_Error::error(403);
+        }
+
+        if ($this->view->waiting_payment_id !== null) {
+            Minz_Request::forward(array(
+                'c' => 'billing',
+                'a' => 'index',
+            ), true);
         }
 
         Minz_View::prependTitle('Facturation · ');
@@ -124,15 +142,17 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
             Minz_Error::error(403);
         }
 
-        $username = Minz_Session::param('currentUser', '_');
-        $payment_service = $this->acknowledgeWaitingPayment($username);
+        invalidateHttpCache();
 
-        if ($payment_service === null) {
+        $waiting_payment_id = $this->view->waiting_payment_id;
+        if ($waiting_payment_id === null) {
             Minz_Request::forward(array(
                 'c' => 'billing',
                 'a' => 'index',
             ), true);
         }
+
+        $payment_service = $this->acknowledgeWaitingPayment($waiting_payment_id);
 
         if ($payment_service->isPaid()) {
             $username = $payment_service->username();
@@ -156,6 +176,13 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
     public function addressAction() {
         if (!FreshRSS_Auth::hasAccess()) {
             Minz_Error::error(403);
+        }
+
+        if ($this->view->waiting_payment_id !== null) {
+            Minz_Request::forward(array(
+                'c' => 'billing',
+                'a' => 'index',
+            ), true);
         }
 
         Minz_View::prependTitle('Adresse de facturation · ');
@@ -228,22 +255,7 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
         $this->view->city = $city;
     }
 
-    private function acknowledgeWaitingPayment($username) {
-        $user_conf = get_user_configuration($username);
-        $billing = $user_conf->billing;
-
-        $waiting_payment_id = null;
-        foreach ($billing['payments'] as $id => $payment) {
-            if ($payment['status'] === 'waiting') {
-                $waiting_payment_id = $id;
-                break;
-            }
-        }
-
-        if ($waiting_payment_id === null) {
-            return null;
-        }
-
+    private function acknowledgeWaitingPayment($waiting_payment_id) {
         $system_conf = FreshRSS_Context::$system_conf;
         Payplug::init(
             $system_conf->billing['payplug_secret_key'],
