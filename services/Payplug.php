@@ -15,20 +15,9 @@ class Payplug {
         $address = $user_conf->billing['address'];
         $email = $user_conf->mail_login;
 
-        $return_url = \Minz_Url::display(array(
-            'c' => 'billing',
-            'a' => 'return',
-            'params' => array(
-                'username' => $username,
-            ),
-        ), 'php', true);
-        $cancel_url = \Minz_Url::display(array(
-            'c' => 'billing',
-            'a' => 'cancel',
-            'params' => array(
-                'username' => $username,
-            ),
-        ), 'php', true);
+        $return_url = \Minz_Url::display(
+            array('c' => 'billing', 'a' => 'return'), 'php', true
+        );
 
         $payment = \Payplug\Payment::create(array(
             'amount' => $amount * 100,
@@ -56,7 +45,7 @@ class Payplug {
             ),
             'hosted_payment' => array(
                 'return_url' => $return_url,
-                'cancel_url' => $cancel_url,
+                'cancel_url' => $return_url,
             ),
             'metadata' => array(
                 'username' => $username,
@@ -64,6 +53,11 @@ class Payplug {
             )
         ));
 
+        return new Payplug($payment);
+    }
+
+    public static function retrieve($payment_id) {
+        $payment = \Payplug\Payment::retrieve($payment_id);
         return new Payplug($payment);
     }
 
@@ -105,6 +99,24 @@ class Payplug {
         );
     }
 
+    public function isPaid() {
+        return $this->status === 'paid';
+    }
+
+    public function isCanceled() {
+        return $this->status === 'canceled';
+    }
+
+    public function isWaiting() {
+        return $this->status === 'waiting';
+    }
+
+    public function username() {
+        return $this->payment->metadata['username'];
+    }
+
+    public function frequency() {
+        return $this->payment->metadata['frequency'];
     }
 
     public function pay() {

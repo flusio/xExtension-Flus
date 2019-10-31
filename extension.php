@@ -121,8 +121,7 @@ class FlusExtension extends Minz_Extension {
             Minz_Request::is('billing', 'index') ||
             Minz_Request::is('billing', 'address') ||
             Minz_Request::is('billing', 'renew') ||
-            Minz_Request::is('billing', 'return') ||
-            Minz_Request::is('billing', 'cancel')
+            Minz_Request::is('billing', 'return')
         );
         if ($subscription_is_overdue && !$action_is_allowed) {
             Minz_Request::forward(array(

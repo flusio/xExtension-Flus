@@ -124,15 +124,33 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
             Minz_Error::error(403);
         }
 
-        Minz_View::prependTitle('Prise en compte du paiement · ');
-    }
+        $username = Minz_Session::param('currentUser', '_');
+        $payment_service = $this->acknowledgeWaitingPayment($username);
 
-    public function cancelAction() {
-        if (!FreshRSS_Auth::hasAccess()) {
-            Minz_Error::error(403);
+        if ($payment_service === null) {
+            Minz_Request::forward(array(
+                'c' => 'billing',
+                'a' => 'index',
+            ), true);
         }
 
-        Minz_View::prependTitle('Annulation du paiement · ');
+        if ($payment_service->isPaid()) {
+            $username = $payment_service->username();
+            $frequency = $payment_service->frequency();
+            $this->approvePayment($username, $frequency);
+        }
+
+        if ($payment_service->isPaid()) {
+            Minz_View::prependTitle('Validation du paiement · ');
+        } elseif ($payment_service->isCanceled()) {
+            Minz_View::prependTitle('Annulation du paiement · ');
+        } elseif ($payment_service->isWaiting()) {
+            Minz_View::prependTitle('Prise en compte du paiement · ');
+        } else {
+            Minz_View::prependTitle('Échec du paiement · ');
+        }
+
+        $this->view->payment = $payment_service->payment();
     }
 
     public function addressAction() {
@@ -208,5 +226,59 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
         $this->view->address = $address;
         $this->view->postcode = $postcode;
         $this->view->city = $city;
+    }
+
+    private function acknowledgeWaitingPayment($username) {
+        $user_conf = get_user_configuration($username);
+        $billing = $user_conf->billing;
+
+        $waiting_payment_id = null;
+        foreach ($billing['payments'] as $id => $payment) {
+            if ($payment['status'] === 'waiting') {
+                $waiting_payment_id = $id;
+                break;
+            }
+        }
+
+        if ($waiting_payment_id === null) {
+            return null;
+        }
+
+        $system_conf = FreshRSS_Context::$system_conf;
+        Payplug::init(
+            $system_conf->billing['payplug_secret_key'],
+            $system_conf->billing['payplug_api_version']
+        );
+        $payment_service = Payplug::retrieve($waiting_payment_id);
+        $payment_service->syncStatus();
+        $payment_service->save();
+        return $payment_service;
+    }
+
+    private function approvePayment($username, $frequency) {
+        $user_conf = get_user_configuration($username);
+        $billing = $user_conf->billing;
+        $current_subscription_end_at = $billing['subscription_end_at'];
+
+        // no need to renew a user with a free plan (subscription_end_at === null)
+        if ($current_subscription_end_at !== null) {
+            if ($frequency === 'year') {
+                $interval = '1 year';
+            } else {
+                $interval = '1 month';
+            }
+
+            $today = time();
+            $base_date_renewal = max($today, $current_subscription_end_at);
+
+            $subscription_end_at = date_create()->setTimestamp($base_date_renewal);
+            date_add(
+                $subscription_end_at, date_interval_create_from_date_string($interval)
+            );
+            $billing['subscription_end_at'] = $subscription_end_at->getTimestamp();
+        }
+
+        $user_conf->billing = $billing;
+        return $user_conf->save();
     }
 }
