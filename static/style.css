@@ -65,6 +65,14 @@
 }
 
 /* Payments table */
+.fl-payments-table th {
+    text-align: left;
+}
+
+.fl-payments-table td.numeric {
+    text-align: right;
+}
+
 .fl-payments-table th,
 .fl-payments-table td {
     padding-left: 3rem;
