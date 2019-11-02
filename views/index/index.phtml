@@ -106,6 +106,41 @@
         </p>
     </section>
 
+    <section class="fl-section fl-section-prices">
+        <div class="fl-columns">
+            <div class="fl-column fl-column-centered">
+                <p>
+                    <strong><?= $this->month_price ?>&nbsp;€ par mois</strong><br />
+                    ou<br />
+                    <strong><?= $this->year_price ?>&nbsp;€ par an</strong><br />
+                </p>
+            </div>
+
+            <div class="fl-column">
+                <h2>Nos tarifs sont simples et transparents</h2>
+
+                <p>
+                    En vous abonnant à Flus, vous payez un prix unique, au mois
+                    ou à l’année. Nous n’appliquons pas de tarifs progressifs
+                    en fonction du nombre de vos sources d’information.
+                </p>
+
+                <p>
+                    Nous avons écrit un article <a href="https://flus.io/carnet/tarification-viser-juste.html">
+                    pour expliquer le choix de cette tarification</a>.
+                </p>
+
+                <?php if ($this->registration_opened) { ?>
+                    <p class="center">
+                        <a class="btn btn-important" href="<?= _url('auth', 'register') ?>">
+                            Inscrivez-vous, le 1er mois est gratuit
+                        </a>
+                    </p>
+                <?php } ?>
+             </div>
+        </div>
+    </section>
+
     <section class="fl-section fl-section-freshrss">
         <div class="fl-columns">
             <div class="fl-column">
