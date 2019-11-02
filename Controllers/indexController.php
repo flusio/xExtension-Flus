@@ -17,6 +17,9 @@ class FreshExtension_index_Controller extends FreshRSS_index_Controller {
             Minz_View::appendStyle($this->extension->getFileUrl('home.css', 'css'));
             $this->view->registration_opened = !max_registrations_reached();
             $this->view->illustration_url = $this->extension->getFileUrl('screenshot.png', 'png');
+            $system_conf = FreshRSS_Context::$system_conf;
+            $this->view->month_price = $system_conf->billing['month_price'];
+            $this->view->year_price = $system_conf->billing['year_price'];
             Minz_View::prependTitle('Suivez l’actualité qui vous intéresse · ');
         }
     }

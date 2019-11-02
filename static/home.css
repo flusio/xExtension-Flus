@@ -27,6 +27,13 @@ h1 {
   margin-bottom: 1.75rem;
 }
 
+h2 {
+    display: inline-block;
+    padding-bottom: .50rem;
+
+    border-bottom: .30rem solid var(--color-primary-50);
+}
+
 h1 { font-size: 2rem; line-height: 2.5rem; }
 h2 { font-size: 1.5rem; line-height: 2rem; }
 h3 { font-size: 1rem; line-height: 1.5rem; }
@@ -35,6 +42,14 @@ h3 { font-size: 1rem; line-height: 1.5rem; }
 * + h2,
 * + h3 {
   margin-top: 1.5rem;
+}
+
+/* Typography > links */
+a {
+    text-decoration: underline;
+}
+a.btn-important {
+    text-decoration: none;
 }
 
 /* Components > columns */
@@ -54,6 +69,7 @@ h3 { font-size: 1rem; line-height: 1.5rem; }
 
     align-items: center;
     justify-content: center;
+    text-align: center;
 }
 
 @media(min-width: 800px) {
@@ -107,12 +123,17 @@ img.illustration:hover {
     margin-top: 8rem;
     margin-bottom: 8rem;
     padding: 2rem;
-
-    border: .25rem solid var(--secondary-color);
-    border-radius: .5rem;
 }
 .fl-page.fl-page-home .fl-section-freshrss .fl-columns {
     margin-top: 0;
+}
+
+.fl-page.fl-page-home .fl-section-prices .fl-column-centered {
+    font-size: 1.5rem;
+}
+.fl-page.fl-page-home .fl-section-prices .fl-column-centered p {
+    margin-top: 0;
+    margin-bottom: 0;
 }
 
 /* Components > page header */
@@ -132,8 +153,6 @@ img.illustration:hover {
 
     font-size: 1.4rem;
     font-weight: bold;
-}
-.fl-page-header nav .fl-page-header-brand:hover {
     text-decoration: none;
 }
 
