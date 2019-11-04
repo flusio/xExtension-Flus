@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<opml version="2.0">
+  <head>
+    <title>Flus default OPML</title>
+    <dateCreated>Mon, 04 Nov 2019 18:00:00</dateCreated>
+  </head>
+  <body>
+    <outline
+      text="carnet de flus"
+      type="rss"
+      xmlUrl="https://flus.io/carnet/feeds/all.atom.xml"
+      htmlUrl="https://flus.io/carnet/"
+      description="Fil d’actualités du carnet de Flus"
+    />
+    <outline
+      text="Statut de flus.io"
+      type="rss"
+      xmlUrl="https://status.flus.io/feeds/all.atom.xml"
+      htmlUrl="https://status.flus.io/"
+      description="Suivi du statut du service flus.io (maintenances planifiées et incidents)"
+    />
+  </body>
+</opml>

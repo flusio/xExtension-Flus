@@ -5,6 +5,7 @@ class FlusExtension extends Minz_Extension {
         $files_to_install = array(
             '/legals/cgu.html' => DATA_PATH . '/tos.html',
             '/config-user.custom.php' => DATA_PATH . '/config-user.custom.php',
+            '/default-feeds.xml' => DATA_PATH . '/opml.xml',
         );
 
         foreach ($files_to_install as $src_file => $dest_file) {
@@ -20,6 +21,7 @@ class FlusExtension extends Minz_Extension {
         $files_to_unlink = array(
             DATA_PATH . '/tos.html',
             DATA_PATH . '/config-user.custom.php',
+            DATA_PATH . '/opml.xml',
         );
 
         foreach ($files_to_unlink as $file) {
