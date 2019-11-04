@@ -81,6 +81,12 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
             ), true);
         }
 
+        // disable renew while I don't have a bank account
+        Minz_Request::forward(array(
+            'c' => 'billing',
+            'a' => 'index',
+        ), true);
+
         Minz_View::prependTitle('Facturation · ');
 
         $system_conf = FreshRSS_Context::$system_conf;
