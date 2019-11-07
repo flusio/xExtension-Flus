@@ -63,6 +63,7 @@ class Payplug {
 
     private $payment = null;
     private $status = 'unknown';
+    private $invoice_number = '';
 
     private function __construct($payment) {
         $this->payment = $payment;
@@ -96,6 +97,7 @@ class Payplug {
             'date' => $this->payment->created_at,
             'frequency' => $this->payment->metadata['frequency'],
             'amount' => $this->payment->amount / 100,
+            'invoice_number' => $this->invoice_number,
         );
     }
 
@@ -121,5 +123,51 @@ class Payplug {
 
     public function pay() {
         header('Location: ' . $this->payment->hosted_payment->payment_url);
+    }
+
+    public function generateInvoiceNumber() {
+        $invoices_path = DATA_PATH . '/extensions-data/xExtension-Flus/invoices';
+        $lock_path = $invoices_path . '/.lock';
+
+        $lock_file = fopen($lock_path, 'r+');
+
+        if (flock($lock_file, LOCK_EX)) {
+            $last_invoice_number = @fread($lock_file, filesize($lock_path));
+            $this->invoice_number = $this->getNextInvoiceNumber($last_invoice_number);
+            $this->save();
+
+            rewind($lock_file);
+            fwrite($lock_file, $this->invoice_number);
+
+            flock($lock_file, LOCK_UN);
+        }
+
+        fclose($lock_file);
+
+        return $this->invoice_number;
+    }
+
+    private function getNextInvoiceNumber($last_invoice_number) {
+        $current_date = getdate();
+        $year = $current_date['year'];
+        $month = $current_date['mon'];
+
+        $invoice_sequence = 1;
+        if ($last_invoice_number) {
+            list(
+                $last_invoice_year,
+                $last_invoice_month,
+                $last_invoice_sequence
+            ) = array_map('intval', explode('-', $last_invoice_number));
+
+            if ($last_invoice_year === $year) {
+                $invoice_sequence = $last_invoice_sequence + 1;
+            }
+        }
+
+        $invoice_format = '%04d-%02d-%04d';
+        return sprintf(
+            $invoice_format, $year, $month, $invoice_sequence
+        );
     }
 }

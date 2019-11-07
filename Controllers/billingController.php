@@ -164,6 +164,7 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
             $username = $payment_service->username();
             $frequency = $payment_service->frequency();
             $this->approvePayment($username, $frequency);
+            $payment_service->generateInvoiceNumber();
         }
 
         if ($payment_service->isPaid()) {

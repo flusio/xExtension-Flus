@@ -14,6 +14,11 @@ class FlusExtension extends Minz_Extension {
                 return false;
             }
         }
+
+        $invoices_path = DATA_PATH . '/extensions-data/xExtension-Flus/invoices';
+        mkdir($invoices_path, 0775, true);
+        touch($invoices_path . '/.lock');
+
         return true;
     }
 
