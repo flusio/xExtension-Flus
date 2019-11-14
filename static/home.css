@@ -4,7 +4,7 @@ html {
 }
 /* Typography > paragraphs */
 p.lead {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
 }
 
 p.secondary {
@@ -119,21 +119,17 @@ img.illustration:hover {
     max-width: 384px;
 }
 
-.fl-page.fl-page-home .fl-section-freshrss {
-    margin-top: 8rem;
-    margin-bottom: 8rem;
-    padding: 2rem;
-}
-.fl-page.fl-page-home .fl-section-freshrss .fl-columns {
-    margin-top: 0;
-}
-
 .fl-page.fl-page-home .fl-section-prices .fl-column-centered {
     font-size: 1.5rem;
 }
 .fl-page.fl-page-home .fl-section-prices .fl-column-centered p {
     margin-top: 0;
     margin-bottom: 0;
+}
+
+.fl-page.fl-page-home .fl-section-carnet {
+    margin-top: 8rem;
+    margin-bottom: 8rem;
 }
 
 /* Components > page header */
