@@ -14,6 +14,11 @@ class FlusExtension extends Minz_Extension {
                 return false;
             }
         }
+
+        $invoices_path = DATA_PATH . '/extensions-data/xExtension-Flus/invoices';
+        mkdir($invoices_path, 0775, true);
+        touch($invoices_path . '/.lock');
+
         return true;
     }
 
@@ -58,6 +63,8 @@ class FlusExtension extends Minz_Extension {
         } elseif (strpos($class_name, 'Payplug') === 0) {
             $base_path = $this->getPath() . '/lib/payplug-php/lib/';
             include($base_path . str_replace('\\', '/', $class_name) . '.php');
+        } elseif ($class_name === 'FPDF') {
+            include($this->getPath() . '/lib/fpdf/fpdf.php');
         }
     }
 
