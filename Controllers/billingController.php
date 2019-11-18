@@ -1,6 +1,7 @@
 <?php
 
 use \Flus\services\Payplug;
+use \Flus\models\Invoice;
 
 class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
     public function init() {
@@ -164,7 +165,13 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
             $username = $payment_service->username();
             $frequency = $payment_service->frequency();
             $this->approvePayment($username, $frequency);
-            $payment_service->generateInvoiceNumber();
+
+            $invoice_number = $payment_service->generateInvoiceNumber();
+
+            $invoices_path = DATA_PATH . '/extensions-data/xExtension-Flus/invoices';
+            $invoice_filepath = $invoices_path . '/facture-' . $invoice_number . '.pdf';
+            $invoice = new Invoice($invoice_number, $payment_service);
+            $invoice->saveAsPdf($invoice_filepath);
         }
 
         if ($payment_service->isPaid()) {

@@ -113,6 +113,24 @@ class Payplug {
         return $this->status === 'waiting';
     }
 
+    public function date() {
+        return $this->payment->created_at;
+    }
+
+    public function amount() {
+        return $this->payment->amount / 100;
+    }
+
+    public function address() {
+        return [
+            'first_name' => $this->payment->billing->first_name,
+            'last_name' => $this->payment->billing->last_name,
+            'address1' => $this->payment->billing->address1,
+            'postcode' => $this->payment->billing->postcode,
+            'city' => $this->payment->billing->city,
+        ];
+    }
+
     public function username() {
         return $this->payment->metadata['username'];
     }
