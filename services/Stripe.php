@@ -2,6 +2,8 @@
 
 namespace Flus\services;
 
+use \Flus\models\Invoice;
+
 class Stripe {
     public static function init($key) {
         \Stripe\Stripe::setApiKey($key);
@@ -11,8 +13,8 @@ class Stripe {
         $user_conf = get_user_configuration($username);
         $email = $user_conf->mail_login;
 
-        $return_url = \Minz_Url::display(
-            ['c' => 'billing', 'a' => 'return'], 'php', true
+        $success_url = \Minz_Url::display(
+            ['c' => 'billing', 'a' => 'success'], 'php', true
         );
         $cancel_url = \Minz_Url::display(
             ['c' => 'billing', 'a' => 'cancel'], 'php', true
@@ -33,7 +35,7 @@ class Stripe {
                     'frequency' => $frequency,
                 ],
             ],
-            'success_url' => $return_url,
+            'success_url' => $success_url,
             'cancel_url' => $cancel_url,
             'expand' => ['payment_intent'],
         ]);
@@ -143,49 +145,39 @@ class Stripe {
         return $this->session->payment_intent->metadata['frequency'];
     }
 
-    public function generateInvoiceNumber() {
-        $invoices_path = DATA_PATH . '/extensions-data/xExtension-Flus/invoices';
-        $lock_path = $invoices_path . '/.lock';
+    public function approve() {
+        $user_conf = get_user_configuration($this->username());
+        $billing = $user_conf->billing;
+        $current_subscription_end_at = $billing['subscription_end_at'];
 
-        $lock_file = fopen($lock_path, 'r+');
+        // no need to renew a user with a free plan (subscription_end_at === null)
+        if ($current_subscription_end_at !== null) {
+            $frequency = $this->frequency();
+            if ($frequency === 'year') {
+                $interval = '1 year';
+            } else {
+                $interval = '1 month';
+            }
 
-        if (flock($lock_file, LOCK_EX)) {
-            $last_invoice_number = @fread($lock_file, filesize($lock_path));
-            $this->invoice_number = $this->getNextInvoiceNumber($last_invoice_number);
-            $this->save();
+            $today = time();
+            $base_date_renewal = max($today, $current_subscription_end_at);
 
-            rewind($lock_file);
-            fwrite($lock_file, $this->invoice_number);
-
-            flock($lock_file, LOCK_UN);
+            $subscription_end_at = date_create()->setTimestamp($base_date_renewal);
+            date_add(
+                $subscription_end_at, date_interval_create_from_date_string($interval)
+            );
+            $billing['subscription_end_at'] = $subscription_end_at->getTimestamp();
         }
 
-        fclose($lock_file);
-
-        return $this->invoice_number;
+        $user_conf->billing = $billing;
+        return $user_conf->save();
     }
 
-    private function getNextInvoiceNumber($last_invoice_number) {
-        $current_date = getdate();
-        $year = $current_date['year'];
-        $month = $current_date['mon'];
+    public function generateInvoice() {
+        $invoice = Invoice::generate($this);
+        $invoice->saveAsPdf();
 
-        $invoice_sequence = 1;
-        if ($last_invoice_number) {
-            list(
-                $last_invoice_year,
-                $last_invoice_month,
-                $last_invoice_sequence
-            ) = array_map('intval', explode('-', $last_invoice_number));
-
-            if ($last_invoice_year === $year) {
-                $invoice_sequence = $last_invoice_sequence + 1;
-            }
-        }
-
-        $invoice_format = '%04d-%02d-%04d';
-        return sprintf(
-            $invoice_format, $year, $month, $invoice_sequence
-        );
+        $this->invoice_number = $invoice->number;
+        $this->save();
     }
 }

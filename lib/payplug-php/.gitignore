@@ -1,8 +1,0 @@
-*~
-*.swp
-_build/
-.idea/
-vendor/
-*.iml
-*.phar
-coverage/

@@ -1,7 +1,6 @@
 <?php
 
 use \Flus\services\Stripe;
-use \Flus\models\Invoice;
 
 class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
     public function init() {
@@ -147,7 +146,7 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
         $this->view->checkout_session_id = $waiting_payment_id;
     }
 
-    public function returnAction() {
+    public function successAction() {
         if (!FreshRSS_Auth::hasAccess()) {
             Minz_Error::error(403);
         }
@@ -162,25 +161,20 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
             ), true);
         }
 
-        $payment_service = $this->acknowledgeWaitingPayment($waiting_payment_id);
+        $system_conf = FreshRSS_Context::$system_conf;
+        Stripe::init($system_conf->billing['stripe_secret_key']);
+
+        $payment_service = Stripe::retrieve($waiting_payment_id);
+        $payment_service->syncStatus();
+        $payment_service->save();
 
         if ($payment_service->isPaid()) {
-            $username = $payment_service->username();
-            $frequency = $payment_service->frequency();
-            $this->approvePayment($username, $frequency);
-
-            $invoice_number = $payment_service->generateInvoiceNumber();
-
-            $invoices_path = DATA_PATH . '/extensions-data/xExtension-Flus/invoices';
-            $invoice_filepath = $invoices_path . '/facture-' . $invoice_number . '.pdf';
-            $invoice = new Invoice($invoice_number, $payment_service);
-            $invoice->saveAsPdf($invoice_filepath);
+            $payment_service->approve();
+            $payment_service->generateInvoice();
         }
 
         if ($payment_service->isPaid()) {
             Minz_View::prependTitle('Validation du paiement · ');
-        } elseif ($payment_service->isCanceled()) {
-            Minz_View::prependTitle('Annulation du paiement · ');
         } elseif ($payment_service->isWaiting()) {
             Minz_View::prependTitle('Prise en compte du paiement · ');
         } else {
@@ -295,41 +289,5 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
         $this->view->address = $address;
         $this->view->postcode = $postcode;
         $this->view->city = $city;
-    }
-
-    private function acknowledgeWaitingPayment($waiting_payment_id) {
-        $system_conf = FreshRSS_Context::$system_conf;
-        Stripe::init($system_conf->billing['stripe_secret_key']);
-        $payment_service = Stripe::retrieve($waiting_payment_id);
-        $payment_service->syncStatus();
-        $payment_service->save();
-        return $payment_service;
-    }
-
-    private function approvePayment($username, $frequency) {
-        $user_conf = get_user_configuration($username);
-        $billing = $user_conf->billing;
-        $current_subscription_end_at = $billing['subscription_end_at'];
-
-        // no need to renew a user with a free plan (subscription_end_at === null)
-        if ($current_subscription_end_at !== null) {
-            if ($frequency === 'year') {
-                $interval = '1 year';
-            } else {
-                $interval = '1 month';
-            }
-
-            $today = time();
-            $base_date_renewal = max($today, $current_subscription_end_at);
-
-            $subscription_end_at = date_create()->setTimestamp($base_date_renewal);
-            date_add(
-                $subscription_end_at, date_interval_create_from_date_string($interval)
-            );
-            $billing['subscription_end_at'] = $subscription_end_at->getTimestamp();
-        }
-
-        $user_conf->billing = $billing;
-        return $user_conf->save();
     }
 }
