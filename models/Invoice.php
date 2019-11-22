@@ -5,7 +5,12 @@ namespace Flus\models;
 class Invoice {
     const INVOICES_PATH = DATA_PATH . '/extensions-data/xExtension-Flus/invoices';
 
-    public static function generateInvoiceNumber() {
+    public static function generate($payment_service) {
+        $invoice_number = self::generateInvoiceNumber();
+        return new Invoice($invoice_number, $payment_service);
+    }
+
+    private static function generateInvoiceNumber() {
         $lock_path = self::INVOICES_PATH . '/.lock';
 
         $lock_file = fopen($lock_path, 'r+');
@@ -52,7 +57,7 @@ class Invoice {
     }
 
     public function __construct($invoice_number, $payment_service) {
-        $this->invoice_number = $invoice_number;
+        $this->number = $invoice_number;
         $this->delivery_date = timestamptodate($payment_service->date(), false);
         $this->client_username = $payment_service->username();
         $this->address = $payment_service->address();
@@ -64,7 +69,7 @@ class Invoice {
         $pdf = new InvoicePdf();
         $pdf->addLogo('https://flus.io/carnet/logo.png');
         $pdf->addInvoiceInformation([
-            'N° facture' => $this->invoice_number,
+            'N° facture' => $this->number,
             'Date' => $this->delivery_date,
             'Identifiant client' => $this->client_username,
         ]);
@@ -97,7 +102,7 @@ class Invoice {
             'TVA non applicable, art. 293 B du CGI',
         ]);
 
-        $invoice_filepath = self::INVOICES_PATH . '/facture-' . $this->invoice_number . '.pdf';
+        $invoice_filepath = self::INVOICES_PATH . '/facture-' . $this->number . '.pdf';
         $pdf->save($invoice_filepath);
     }
 }

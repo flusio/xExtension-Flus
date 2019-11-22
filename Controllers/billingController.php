@@ -1,7 +1,6 @@
 <?php
 
 use \Flus\services\Stripe;
-use \Flus\models\Invoice;
 
 class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
     public function init() {
@@ -173,10 +172,7 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
             $username = $payment_service->username();
             $frequency = $payment_service->frequency();
             $this->approvePayment($username, $frequency);
-
-            $invoice_number = $payment_service->generateInvoiceNumber();
-            $invoice = new Invoice($invoice_number, $payment_service);
-            $invoice->saveAsPdf();
+            $payment_service->generateInvoice();
         }
 
         if ($payment_service->isPaid()) {

@@ -2,6 +2,8 @@
 
 namespace Flus\services;
 
+use \Flus\models\Invoice;
+
 class Stripe {
     public static function init($key) {
         \Stripe\Stripe::setApiKey($key);
@@ -143,8 +145,11 @@ class Stripe {
         return $this->session->payment_intent->metadata['frequency'];
     }
 
-    public function generateInvoiceNumber() {
-        $this->invoice_number = Invoice::generateInvoiceNumber();
+    public function generateInvoice() {
+        $invoice = Invoice::generate($this);
+        $invoice->saveAsPdf();
+
+        $this->invoice_number = $invoice->number;
         $this->save();
     }
 }
