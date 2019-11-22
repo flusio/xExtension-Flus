@@ -19,15 +19,8 @@
         <?php } ?>
     </p>
 
-    <?php if (true) { ?>
-        <p class="alert alert-warn">
-            Ici se trouvera un bouton pour renouveler votre abonnement.
-            Celui-ci est désactivé pour le moment car la banque a perdu mon
-            dossier de création de compte, donc je n’ai pas encore de moyen
-            d’encaisser des paiements :)
-        </p>
-    <?php } elseif ($this->waiting_payment_id) { ?>
-        <a class="btn btn-important" href="<?= _url('billing', 'return') ?>">
+    <?php if ($this->waiting_payment_id) { ?>
+        <a class="btn btn-important" href="<?= _url('billing', 'pay') ?>">
             Vérifier l’état de votre paiement en attente
         </a>
     <?php } elseif ($this->subscription_end_is_soon) { ?>

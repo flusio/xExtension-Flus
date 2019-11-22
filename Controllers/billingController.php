@@ -1,6 +1,6 @@
 <?php
 
-use \Flus\services\Payplug;
+use \Flus\services\Stripe;
 use \Flus\models\Invoice;
 
 class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
@@ -82,12 +82,6 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
             ), true);
         }
 
-        // disable renew while I don't have a bank account
-        Minz_Request::forward(array(
-            'c' => 'billing',
-            'a' => 'index',
-        ), true);
-
         Minz_View::prependTitle('Facturation · ');
 
         $system_conf = FreshRSS_Context::$system_conf;
@@ -125,15 +119,32 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
 
             $username = Minz_Session::param('currentUser', '_');
 
-            Payplug::init(
-                $system_conf->billing['payplug_secret_key'],
-                $system_conf->billing['payplug_api_version']
-            );
-            $payment_service = Payplug::create($username, $frequency, $amount);
+            Stripe::init($system_conf->billing['stripe_secret_key']);
+            $payment_service = Stripe::create($username, $frequency, $amount);
             $payment_service->syncStatus();
             $payment_service->save();
-            $payment_service->pay();
+
+            Minz_Request::forward(
+                ['c' => 'billing', 'a' => 'pay'], true
+            );
         }
+    }
+
+    public function payAction() {
+        $system_conf = FreshRSS_Context::$system_conf;
+        $waiting_payment_id = $this->view->waiting_payment_id;
+        if ($waiting_payment_id === null) {
+            Minz_Request::forward(array(
+                'c' => 'billing',
+                'a' => 'index',
+            ), true);
+        }
+
+        Minz_View::appendScript('https://js.stripe.com/v3/', false, true, false);
+
+        $this->view->_layout('redirection');
+        $this->view->stripe_public_key = $system_conf->billing['stripe_public_key'];
+        $this->view->checkout_session_id = $waiting_payment_id;
     }
 
     public function returnAction() {
@@ -176,6 +187,31 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
             Minz_View::prependTitle('Échec du paiement · ');
         }
 
+        $this->view->payment = $payment_service->payment();
+    }
+
+    public function cancelAction() {
+        if (!FreshRSS_Auth::hasAccess()) {
+            Minz_Error::error(403);
+        }
+
+        invalidateHttpCache();
+
+        $waiting_payment_id = $this->view->waiting_payment_id;
+        if ($waiting_payment_id === null) {
+            Minz_Request::forward(array(
+                'c' => 'billing',
+                'a' => 'index',
+            ), true);
+        }
+
+        $system_conf = FreshRSS_Context::$system_conf;
+        Stripe::init($system_conf->billing['stripe_secret_key']);
+        $payment_service = Stripe::retrieve($waiting_payment_id);
+        $payment_service->cancel();
+        $payment_service->save();
+
+        Minz_View::prependTitle('Annulation du paiement · ');
         $this->view->payment = $payment_service->payment();
     }
 
@@ -263,11 +299,8 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
 
     private function acknowledgeWaitingPayment($waiting_payment_id) {
         $system_conf = FreshRSS_Context::$system_conf;
-        Payplug::init(
-            $system_conf->billing['payplug_secret_key'],
-            $system_conf->billing['payplug_api_version']
-        );
-        $payment_service = Payplug::retrieve($waiting_payment_id);
+        Stripe::init($system_conf->billing['stripe_secret_key']);
+        $payment_service = Stripe::retrieve($waiting_payment_id);
         $payment_service->syncStatus();
         $payment_service->save();
         return $payment_service;
