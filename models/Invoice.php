@@ -3,6 +3,8 @@
 namespace Flus\models;
 
 class Invoice {
+    const INVOICES_PATH = DATA_PATH . '/extensions-data/xExtension-Flus/invoices';
+
     public function __construct($invoice_number, $payment_service) {
         $this->invoice_number = $invoice_number;
         $this->delivery_date = timestamptodate($payment_service->date(), false);
@@ -12,7 +14,7 @@ class Invoice {
         $this->frequency = $payment_service->frequency();
     }
 
-    public function saveAsPdf($filepath) {
+    public function saveAsPdf() {
         $pdf = new InvoicePdf();
         $pdf->addLogo('https://flus.io/carnet/logo.png');
         $pdf->addInvoiceInformation([
@@ -48,7 +50,9 @@ class Invoice {
             'micro-entreprise – N° Siret 878 196 278 00013 – 878 196 278 R.C.S. Grenoble',
             'TVA non applicable, art. 293 B du CGI',
         ]);
-        $pdf->save($filepath);
+
+        $invoice_filepath = self::INVOICES_PATH . '/facture-' . $this->invoice_number . '.pdf';
+        $pdf->save($invoice_filepath);
     }
 }
 

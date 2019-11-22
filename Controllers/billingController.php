@@ -175,11 +175,8 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
             $this->approvePayment($username, $frequency);
 
             $invoice_number = $payment_service->generateInvoiceNumber();
-
-            $invoices_path = DATA_PATH . '/extensions-data/xExtension-Flus/invoices';
-            $invoice_filepath = $invoices_path . '/facture-' . $invoice_number . '.pdf';
             $invoice = new Invoice($invoice_number, $payment_service);
-            $invoice->saveAsPdf($invoice_filepath);
+            $invoice->saveAsPdf();
         }
 
         if ($payment_service->isPaid()) {
