@@ -14,13 +14,6 @@
             <?= $this->payment['frequency'] === 'month' ? 'd’un mois.' : 'd’une année.' ?>
         </p>
 
-    <?php } elseif ($this->payment['status'] === 'canceled') { ?>
-        <h1>Annulation du paiement</h1>
-
-        <p>
-            Le paiement a été annulé, il ne vous sera rien débité.
-        </p>
-
     <?php } elseif ($this->payment['status'] === 'waiting') { ?>
         <h1>Prise en compte du paiement</h1>
 
@@ -30,7 +23,7 @@
         </p>
 
         <p>
-            <a class="btn" href="<?= _url('billing', 'return') ?>">Rafraîchir la page</a>
+            <a class="btn" href="<?= _url('billing', 'success') ?>">Rafraîchir la page</a>
         </p>
 
     <?php } else { ?>

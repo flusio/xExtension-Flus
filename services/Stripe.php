@@ -13,8 +13,8 @@ class Stripe {
         $user_conf = get_user_configuration($username);
         $email = $user_conf->mail_login;
 
-        $return_url = \Minz_Url::display(
-            ['c' => 'billing', 'a' => 'return'], 'php', true
+        $success_url = \Minz_Url::display(
+            ['c' => 'billing', 'a' => 'success'], 'php', true
         );
         $cancel_url = \Minz_Url::display(
             ['c' => 'billing', 'a' => 'cancel'], 'php', true
@@ -35,7 +35,7 @@ class Stripe {
                     'frequency' => $frequency,
                 ],
             ],
-            'success_url' => $return_url,
+            'success_url' => $success_url,
             'cancel_url' => $cancel_url,
             'expand' => ['payment_intent'],
         ]);

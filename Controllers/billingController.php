@@ -146,7 +146,7 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
         $this->view->checkout_session_id = $waiting_payment_id;
     }
 
-    public function returnAction() {
+    public function successAction() {
         if (!FreshRSS_Auth::hasAccess()) {
             Minz_Error::error(403);
         }
@@ -175,8 +175,6 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
 
         if ($payment_service->isPaid()) {
             Minz_View::prependTitle('Validation du paiement · ');
-        } elseif ($payment_service->isCanceled()) {
-            Minz_View::prependTitle('Annulation du paiement · ');
         } elseif ($payment_service->isWaiting()) {
             Minz_View::prependTitle('Prise en compte du paiement · ');
         } else {
