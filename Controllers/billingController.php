@@ -162,7 +162,12 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
             ), true);
         }
 
-        $payment_service = $this->acknowledgeWaitingPayment($waiting_payment_id);
+        $system_conf = FreshRSS_Context::$system_conf;
+        Stripe::init($system_conf->billing['stripe_secret_key']);
+
+        $payment_service = Stripe::retrieve($waiting_payment_id);
+        $payment_service->syncStatus();
+        $payment_service->save();
 
         if ($payment_service->isPaid()) {
             $username = $payment_service->username();
@@ -295,15 +300,6 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
         $this->view->address = $address;
         $this->view->postcode = $postcode;
         $this->view->city = $city;
-    }
-
-    private function acknowledgeWaitingPayment($waiting_payment_id) {
-        $system_conf = FreshRSS_Context::$system_conf;
-        Stripe::init($system_conf->billing['stripe_secret_key']);
-        $payment_service = Stripe::retrieve($waiting_payment_id);
-        $payment_service->syncStatus();
-        $payment_service->save();
-        return $payment_service;
     }
 
     private function approvePayment($username, $frequency) {
