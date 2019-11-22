@@ -1,0 +1,17 @@
+<?php
+    if (!$this->subscription_is_overdue) {
+        $this->partial('aside_configure');
+    }
+?>
+
+<div class="post">
+    <h1>Annulation du paiement</h1>
+
+    <p>
+        Le paiement a été annulé, il ne vous sera rien débité.
+    </p>
+
+    <p>
+        <a href="<?= _url('billing', 'index') ?>">← Retour à la facturation</a>
+    </p>
+</div>

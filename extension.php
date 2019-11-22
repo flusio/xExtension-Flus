@@ -60,6 +60,8 @@ class FlusExtension extends Minz_Extension {
             $class_name = substr($class_name, 5);
             $base_path = $this->getPath() . '/';
             include($base_path . str_replace('\\', '/', $class_name) . '.php');
+        } elseif (strpos($class_name, 'Stripe') === 0) {
+            include($this->getPath() . '/lib/stripe-php/init.php');
         } elseif (strpos($class_name, 'Payplug') === 0) {
             $base_path = $this->getPath() . '/lib/payplug-php/lib/';
             include($base_path . str_replace('\\', '/', $class_name) . '.php');
@@ -126,10 +128,7 @@ class FlusExtension extends Minz_Extension {
             Minz_Request::is('index', 'tos') ||
             Minz_Request::is('index', 'cgv') ||
             Minz_Request::is('auth', 'logout') ||
-            Minz_Request::is('billing', 'index') ||
-            Minz_Request::is('billing', 'address') ||
-            Minz_Request::is('billing', 'renew') ||
-            Minz_Request::is('billing', 'return')
+            Minz_Request::controllerName() === 'billing'
         );
         if ($subscription_is_overdue && !$action_is_allowed) {
             Minz_Request::forward(array(

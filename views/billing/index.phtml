@@ -20,7 +20,7 @@
     </p>
 
     <?php if ($this->waiting_payment_id) { ?>
-        <a class="btn btn-important" href="<?= _url('billing', 'return') ?>">
+        <a class="btn btn-important" href="<?= _url('billing', 'pay') ?>">
             Vérifier l’état de votre paiement en attente
         </a>
     <?php } elseif ($this->subscription_end_is_soon) { ?>
