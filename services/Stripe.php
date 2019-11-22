@@ -145,6 +145,34 @@ class Stripe {
         return $this->session->payment_intent->metadata['frequency'];
     }
 
+    public function approve() {
+        $user_conf = get_user_configuration($this->username());
+        $billing = $user_conf->billing;
+        $current_subscription_end_at = $billing['subscription_end_at'];
+
+        // no need to renew a user with a free plan (subscription_end_at === null)
+        if ($current_subscription_end_at !== null) {
+            $frequency = $this->frequency();
+            if ($frequency === 'year') {
+                $interval = '1 year';
+            } else {
+                $interval = '1 month';
+            }
+
+            $today = time();
+            $base_date_renewal = max($today, $current_subscription_end_at);
+
+            $subscription_end_at = date_create()->setTimestamp($base_date_renewal);
+            date_add(
+                $subscription_end_at, date_interval_create_from_date_string($interval)
+            );
+            $billing['subscription_end_at'] = $subscription_end_at->getTimestamp();
+        }
+
+        $user_conf->billing = $billing;
+        return $user_conf->save();
+    }
+
     public function generateInvoice() {
         $invoice = Invoice::generate($this);
         $invoice->saveAsPdf();

@@ -169,9 +169,7 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
         $payment_service->save();
 
         if ($payment_service->isPaid()) {
-            $username = $payment_service->username();
-            $frequency = $payment_service->frequency();
-            $this->approvePayment($username, $frequency);
+            $payment_service->approve();
             $payment_service->generateInvoice();
         }
 
@@ -293,32 +291,5 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
         $this->view->address = $address;
         $this->view->postcode = $postcode;
         $this->view->city = $city;
-    }
-
-    private function approvePayment($username, $frequency) {
-        $user_conf = get_user_configuration($username);
-        $billing = $user_conf->billing;
-        $current_subscription_end_at = $billing['subscription_end_at'];
-
-        // no need to renew a user with a free plan (subscription_end_at === null)
-        if ($current_subscription_end_at !== null) {
-            if ($frequency === 'year') {
-                $interval = '1 year';
-            } else {
-                $interval = '1 month';
-            }
-
-            $today = time();
-            $base_date_renewal = max($today, $current_subscription_end_at);
-
-            $subscription_end_at = date_create()->setTimestamp($base_date_renewal);
-            date_add(
-                $subscription_end_at, date_interval_create_from_date_string($interval)
-            );
-            $billing['subscription_end_at'] = $subscription_end_at->getTimestamp();
-        }
-
-        $user_conf->billing = $billing;
-        return $user_conf->save();
     }
 }
