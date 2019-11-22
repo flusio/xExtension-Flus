@@ -62,9 +62,6 @@ class FlusExtension extends Minz_Extension {
             include($base_path . str_replace('\\', '/', $class_name) . '.php');
         } elseif (strpos($class_name, 'Stripe') === 0) {
             include($this->getPath() . '/lib/stripe-php/init.php');
-        } elseif (strpos($class_name, 'Payplug') === 0) {
-            $base_path = $this->getPath() . '/lib/payplug-php/lib/';
-            include($base_path . str_replace('\\', '/', $class_name) . '.php');
         } elseif ($class_name === 'FPDF') {
             include($this->getPath() . '/lib/fpdf/fpdf.php');
         }
