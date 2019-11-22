@@ -101,12 +101,9 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
             ), true);
         }
 
-        $this->view->paypal_illustration = $this->extension->getFileUrl('paypal.jpg', 'jpg');
-        $this->view->cb_illustration = $this->extension->getFileUrl('cb.jpg', 'jpg');
         $this->view->month_price = $system_conf->billing['month_price'];
         $this->view->year_price = $system_conf->billing['year_price'];
         $this->view->subscription_frequency = $billing['subscription_frequency'];
-        $this->view->subscription_type = $billing['subscription_type'];
         $this->view->address = $billing['address'];
 
         if (Minz_Request::isPost()) {
@@ -114,14 +111,9 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
             if ($frequency !== 'month' && $frequency !== 'year') {
                 $frequency = 'month';
             }
-            $payment_type = Minz_Request::param('payment-type', 'card');
-            //if ($payment_type !== 'card' && $payment_type !== 'paypal') {
-                $payment_type = 'card';
-            //}
 
-            // Save prefered options for the next time
+            // Save prefered frequency for the next time
             $billing['subscription_frequency'] = $frequency;
-            $billing['subscription_type'] = $payment_type;
             $user_conf->billing = $billing;
             $user_conf->save();
 
