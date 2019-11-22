@@ -5,6 +5,52 @@ namespace Flus\models;
 class Invoice {
     const INVOICES_PATH = DATA_PATH . '/extensions-data/xExtension-Flus/invoices';
 
+    public static function generateInvoiceNumber() {
+        $lock_path = self::INVOICES_PATH . '/.lock';
+
+        $lock_file = fopen($lock_path, 'r+');
+
+        $invoice_number = null;
+
+        if (flock($lock_file, LOCK_EX)) {
+            $last_invoice_number = @fread($lock_file, filesize($lock_path));
+            $invoice_number = self::getNextInvoiceNumber($last_invoice_number);
+
+            rewind($lock_file);
+            fwrite($lock_file, $invoice_number);
+
+            flock($lock_file, LOCK_UN);
+        }
+
+        fclose($lock_file);
+
+        return $invoice_number;
+    }
+
+    private static function getNextInvoiceNumber($last_invoice_number) {
+        $current_date = getdate();
+        $year = $current_date['year'];
+        $month = $current_date['mon'];
+
+        $invoice_sequence = 1;
+        if ($last_invoice_number) {
+            list(
+                $last_invoice_year,
+                $last_invoice_month,
+                $last_invoice_sequence
+            ) = array_map('intval', explode('-', $last_invoice_number));
+
+            if ($last_invoice_year === $year) {
+                $invoice_sequence = $last_invoice_sequence + 1;
+            }
+        }
+
+        $invoice_format = '%04d-%02d-%04d';
+        return sprintf(
+            $invoice_format, $year, $month, $invoice_sequence
+        );
+    }
+
     public function __construct($invoice_number, $payment_service) {
         $this->invoice_number = $invoice_number;
         $this->delivery_date = timestamptodate($payment_service->date(), false);
