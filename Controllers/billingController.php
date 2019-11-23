@@ -45,6 +45,12 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
 
         $user_conf = FreshRSS_Context::$user_conf;
         $payments = $user_conf->billing['payments'];
+        $payments = array_filter(
+            $payments,
+            function($payment) {
+                return $payment['status'] !== 'canceled';
+            }
+        );
         uasort(
             $payments,
             function ($payment1, $payment2) {
