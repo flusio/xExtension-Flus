@@ -70,7 +70,8 @@ class Invoice {
         $pdf->addLogo('https://flus.io/carnet/logo.png');
         $pdf->addInvoiceInformation([
             'N° facture' => $this->number,
-            'Date' => $this->delivery_date,
+            'Établie le' => $this->delivery_date,
+            'Payée le' => $this->delivery_date,
             'Identifiant client' => $this->client_username,
         ]);
         $pdf->addClientInformation([
@@ -138,7 +139,7 @@ class InvoicePdf extends \FPDF {
     }
 
     public function addClientInformation($infos) {
-        $this->SetY(50);
+        $this->SetY(60);
         $this->SetX(-100);
 
         $this->SetFont('', '');
