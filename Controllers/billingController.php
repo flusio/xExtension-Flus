@@ -1,6 +1,7 @@
 <?php
 
 use \Flus\services\Stripe;
+use \Flus\models\Invoice;
 
 class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
     public function init() {
@@ -295,5 +296,40 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
         $this->view->address = $address;
         $this->view->postcode = $postcode;
         $this->view->city = $city;
+    }
+
+    public function downloadInvoiceAction() {
+        if (!FreshRSS_Auth::hasAccess()) {
+            Minz_Error::error(403);
+        }
+
+        $requested_invoice_number = Minz_Request::param('number', '');
+
+        $user_conf = FreshRSS_Context::$user_conf;
+        $payments = $user_conf->billing['payments'];
+        $user_invoice_numbers = array_column($payments, 'invoice_number');
+
+        if (!in_array($requested_invoice_number, $user_invoice_numbers)) {
+            // The user doesn't own the requested invoice
+            $username = Minz_Session::param('currentUser', '_');
+            Minz_Log::warning("${username} tried to access {$requested_invoice_number} invoice PDF file.", ADMIN_LOG);
+            Minz_Error::error(403);
+        }
+
+        $invoice_pdf_path = Invoice::getPdfPath($requested_invoice_number);
+        if (!file_exists($invoice_pdf_path)) {
+            Minz_Log::warning("Invoice n°{$requested_invoice_number} PDF file does not exist.");
+            Minz_Error::error(404);
+        }
+
+        if (!is_readable($invoice_pdf_path)) {
+            Minz_Log::warning("Invoice n°{$requested_invoice_number} PDF file is not readable.");
+            Minz_Error::error(404);
+        }
+
+        $this->view->_layout(false);
+        header('Content-Type: application/pdf');
+        header('Content-Disposition: inline; filename="' . $file_name . '"');
+        readfile($invoice_pdf_path);
     }
 }

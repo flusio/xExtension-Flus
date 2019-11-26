@@ -43,6 +43,7 @@
                     <th class="frequency">Période</th>
                     <th class="amount">Prix</th>
                     <th class="status">État</th>
+                    <th class="invoice">Facture</th>
                 </th>
             </thead>
 
@@ -50,6 +51,7 @@
                 <?php foreach ($this->payments as $payment) { ?>
                     <tr>
                         <td><?= timestamptodate($payment['date']) ?></td>
+
                         <td>
                             <?php if ($payment['frequency'] === 'month') { ?>
                                 1 mois
@@ -57,7 +59,9 @@
                                 1 an
                             <?php } ?>
                         </td>
+
                         <td class="numeric"><?= $payment['amount'] ?>&nbsp;€</td>
+
                         <td>
                             <?php if ($payment['status'] === 'waiting') { ?>
                                 <strong>en attente</strong>
@@ -67,6 +71,18 @@
                                 annulé
                             <?php } else { ?>
                                 <?= $payment['status'] ?>
+                            <?php } ?>
+                        </td>
+
+                        <td>
+                            <?php if ($payment['invoice_number']) { ?>
+                                <a
+                                    href="<?= _url('billing', 'downloadInvoice', 'number', $payment['invoice_number']) ?>"
+                                    target="_blank"
+                                    rel="noreferrer"
+                                >
+                                    Télécharger
+                                </a>
                             <?php } ?>
                         </td>
                     </tr>

@@ -56,6 +56,10 @@ class Invoice {
         );
     }
 
+    public static function getPdfPath($invoice_number) {
+        return self::INVOICES_PATH . '/facture-' . $invoice_number . '.pdf';
+    }
+
     public function __construct($invoice_number, $payment_service) {
         $this->number = $invoice_number;
         $this->delivery_date = timestamptodate($payment_service->date(), false);
@@ -103,7 +107,7 @@ class Invoice {
             'TVA non applicable, art. 293 B du CGI',
         ]);
 
-        $invoice_filepath = self::INVOICES_PATH . '/facture-' . $this->number . '.pdf';
+        $invoice_filepath = self::getPdfPath($this->number);
         $pdf->save($invoice_filepath);
     }
 }
