@@ -65,28 +65,6 @@
                                 payé ✔
                             <?php } elseif ($payment['status'] === 'canceled') { ?>
                                 annulé
-                            <?php } elseif ($payment['status'] === 'card_declined') { ?>
-                                carte déclinée
-                            <?php } elseif ($payment['status'] === 'processing_error') { ?>
-                                erreur de traitement
-                            <?php } elseif ($payment['status'] === 'insufficient_funds') { ?>
-                                fonds insuffisants
-                            <?php } elseif ($payment['status'] === '3ds_declined') { ?>
-                                3D-Secure décliné
-                            <?php } elseif ($payment['status'] === 'incorrect_number') { ?>
-                                numéro incorrect
-                            <?php } elseif ($payment['status'] === 'fraud_suspected') { ?>
-                                fraude suspectée
-                            <?php } elseif ($payment['status'] === 'method_unsupported') { ?>
-                                carte non supportée
-                            <?php } elseif ($payment['status'] === 'card_scheme_mismatch') { ?>
-                                carte incohérente
-                            <?php } elseif ($payment['status'] === 'card_expiration_date_prior_to_last_installment_date') { ?>
-                                carte expirée
-                            <?php } elseif ($payment['status'] === 'aborted') { ?>
-                                interrompu
-                            <?php } elseif ($payment['status'] === 'timeout') { ?>
-                                délai dépassé
                             <?php } else { ?>
                                 <?= $payment['status'] ?>
                             <?php } ?>
