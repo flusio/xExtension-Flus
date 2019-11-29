@@ -20,6 +20,14 @@
     margin-left: 1.5rem;
 }
 
+/* Auth form */
+.formLogin form #use-username-info {
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    padding: .5rem;
+}
+
 /* Address form */
 .fl-address-form .form-group {
     margin-bottom: .5rem;
