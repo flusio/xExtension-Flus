@@ -125,6 +125,7 @@ class FlusExtension extends Minz_Extension {
             Minz_Request::is('index', 'tos') ||
             Minz_Request::is('index', 'cgv') ||
             Minz_Request::is('auth', 'logout') ||
+            Minz_Request::is('feed', 'actualize') ||
             Minz_Request::controllerName() === 'billing'
         );
         if ($subscription_is_overdue && !$action_is_allowed) {
