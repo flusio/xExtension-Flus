@@ -146,6 +146,11 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
             ), true);
         }
 
+        $this->_csp([
+            'default-src' => "'self' js.stripe.com",
+            'script-src' => "'self' 'unsafe-inline' js.stripe.com",
+        ]);
+
         Minz_View::appendScript('https://js.stripe.com/v3/', false, true, false);
 
         $this->view->_layout('redirection');
