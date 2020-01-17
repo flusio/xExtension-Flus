@@ -1,0 +1,15 @@
+Bonjour <?= $this->username ?>,
+
+Vous recevez ce courriel car vous possédez un compte <?= $this->site_title ?> qui a expiré le <?= $this->subscription_end_at ?>. Si vous souhaitez continuer à utiliser le service, vous devez renouveler votre abonnement.
+
+Pour cela, il vous suffit de suivre le lien suivant :
+
+<?= $this->renew_url ?>
+
+
+Si vous avez décidé d’arrêter d’utiliser <?= $this->site_title ?> mais souhaitez récupérer vos données (ou pour toute autre question), vous pouvez me contacter à l’adresse suivante : <?= $this->email_support ?>
+
+
+Merci pour votre soutien !
+
+Marien
