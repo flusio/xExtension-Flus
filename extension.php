@@ -52,19 +52,7 @@ class FlusExtension extends Minz_Extension {
         $this->registerHook('freshrss_init', array('FlusExtension', 'initBillingConfiguration'));
         $this->registerHook('freshrss_init', array('FlusExtension', 'blockIfOverdue'));
 
-        spl_autoload_register(array($this, 'loader'));
-    }
-
-    public function loader($class_name) {
-        if (strpos($class_name, 'Flus') === 0) {
-            $class_name = substr($class_name, 5);
-            $base_path = $this->getPath() . '/';
-            include($base_path . str_replace('\\', '/', $class_name) . '.php');
-        } elseif (strpos($class_name, 'Stripe') === 0) {
-            include($this->getPath() . '/lib/stripe-php/init.php');
-        } elseif ($class_name === 'FPDF') {
-            include($this->getPath() . '/lib/fpdf/fpdf.php');
-        }
+        require(__DIR__ . '/autoload.php');
     }
 
     public static function getMenuEntry() {
@@ -86,6 +74,7 @@ class FlusExtension extends Minz_Extension {
                 'subscription_end_at' => strtotime("+1 month"),
                 'subscription_frequency' => 'month',
                 'payments' => array(),
+                'reminder' => false,
             );
             $user_conf->save();
         }

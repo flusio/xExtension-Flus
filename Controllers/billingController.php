@@ -59,6 +59,10 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
             }
         );
 
+        $this->view->reminder = (
+            isset($user_conf->billing['reminder']) &&
+            $user_conf->billing['reminder']
+        );
         $this->view->payments = $payments;
         $this->view->today = time();
         $this->view->subscription_end_at = $user_conf->billing['subscription_end_at'];
@@ -73,6 +77,54 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
             $this->view->subscription_end_is_soon = $seconds_remaining <= $seconds_before_soon;
         } else {
             $this->view->subscription_end_is_soon = false;
+        }
+    }
+
+    public function reminderAction() {
+        if (!FreshRSS_Auth::hasAccess()) {
+            Minz_Error::error(403);
+        }
+
+        if (!Minz_Request::isPost()) {
+            Minz_Request::forward(array(
+                'c' => 'billing',
+                'a' => 'index',
+            ), true);
+        }
+
+        $user_conf = FreshRSS_Context::$user_conf;
+        $billing = $user_conf->billing;
+
+        if ($billing['subscription_end_at'] === null) {
+            Minz_Request::forward(array(
+                'c' => 'billing',
+                'a' => 'index',
+            ), true);
+        }
+
+        $reminder = Minz_Request::paramBoolean('reminder', false);
+        $billing['reminder'] = $reminder;
+        $user_conf->billing = $billing;
+
+        if ($reminder) {
+            $message = 'Vous recevrez un rappel par courriel lorsque votre abonnement arrivera à échéance.';
+        } else {
+            $message = 'Vous ne recevrez plus de rappel lorsque votre abonnement arrivera à échéance.';
+        }
+
+        if ($user_conf->save()) {
+            Minz_Request::good($message, array(
+                'c' => 'billing',
+                'a' => 'index',
+            ));
+        } else {
+            Minz_Request::bad(
+                'Une erreur est survenue, vous devriez prévenir le support.',
+                array(
+                    'c' => 'billing',
+                    'a' => 'index',
+                )
+            );
         }
     }
 
