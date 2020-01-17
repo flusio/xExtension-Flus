@@ -86,6 +86,7 @@ class FlusExtension extends Minz_Extension {
                 'subscription_end_at' => strtotime("+1 month"),
                 'subscription_frequency' => 'month',
                 'payments' => array(),
+                'reminder' => false,
             );
             $user_conf->save();
         }

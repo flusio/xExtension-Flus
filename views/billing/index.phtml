@@ -19,19 +19,36 @@
         <?php } ?>
     </p>
 
-    <?php if ($this->waiting_payment_id) { ?>
-        <a class="btn btn-important" href="<?= _url('billing', 'pay') ?>">
-            Vérifier l’état de votre paiement en attente
-        </a>
-    <?php } elseif ($this->subscription_end_is_soon) { ?>
-        <a class="btn btn-important" href="<?php echo _url('billing', 'renew'); ?>">
-            Renouveler
-        </a>
-    <?php } else { ?>
-        <a class="btn" href="<?php echo _url('billing', 'renew'); ?>">
-            Renouveler
-        </a>
-    <?php } ?>
+    <div>
+        <?php if ($this->waiting_payment_id) { ?>
+            <a class="btn btn-important" href="<?= _url('billing', 'pay') ?>">
+                Vérifier l’état de votre paiement en attente
+            </a>
+        <?php } elseif ($this->subscription_end_is_soon) { ?>
+            <a class="btn btn-important" href="<?php echo _url('billing', 'renew'); ?>">
+                Renouveler
+            </a>
+        <?php } else { ?>
+            <a class="btn" href="<?php echo _url('billing', 'renew'); ?>">
+                Renouveler
+            </a>
+        <?php } ?>
+
+        <?php if ($this->subscription_end_at !== null) { ?>
+            <form class="form-billing-reminder" method="post" action="<?= _url('billing', 'reminder') ?>">
+                <input type="hidden" name="_csrf" value="<?php echo FreshRSS_Auth::csrfToken(); ?>" />
+                <label for="reminder" class="checkbox">
+                    <input
+                        type="checkbox"
+                        name="reminder"
+                        id="reminder"
+                        <?= $this->reminder ? 'checked' : '' ?>
+                    />
+                    Activer le rappel par courriel à l’approche de l’échéance
+                </label>
+            </form>
+        <?php } ?>
+    </div>
 
     <?php if (!empty($this->payments)) { ?>
         <h2>Historique des paiements</h2>
