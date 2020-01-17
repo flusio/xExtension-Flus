@@ -30,4 +30,6 @@ return array (
     'extensions_enabled' => array (
         'YouTube/PeerTube Video Feed' => true,
     ),
+    'yt_show_content' => true,
+    'yt_nocookie' => true,
 );
