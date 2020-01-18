@@ -56,8 +56,8 @@ foreach ($usernames as $username) {
     if ($interval->invert === 1 && $diff_days === 1) {
         // subscription ended yesterday
         $mailer->send_subscription_ended($username, $user_conf);
-    } elseif ($interval->invert === 0 && ($diff_days === 14 || $diff_days === 2))  {
-        // subscription end in 2 or 14 days
+    } elseif ($interval->invert === 0 && ($diff_days === 2 || $diff_days === 7))  {
+        // subscription end in 2 or 7 days
         $mailer->send_subscription_ending($username, $user_conf);
     }
 }
