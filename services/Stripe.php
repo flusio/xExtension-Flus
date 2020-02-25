@@ -72,9 +72,15 @@ class Stripe {
 
     public function cancel() {
         if ($this->status !== 'waiting') {
+            try {
+                $payment_intent = $this->session->payment_intent;
+                $payment_intent->cancel();
+            } catch (\Stripe\Exception\ApiErrorException $e) {
+                // do nothing on purpose: the payment was already canceled by
+                // Stripe on their side.
+            }
+
             $this->status = 'canceled';
-            $payment_intent = $this->session->payment_intent;
-            $payment_intent->cancel();
         }
     }
 
