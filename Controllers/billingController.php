@@ -295,6 +295,7 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
         $address = '';
         $postcode = '';
         $city = '';
+        $country = 'FR';
 
         $address_missing = !array_key_exists('address', $billing);
         if (!$address_missing) {
@@ -303,6 +304,7 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
             $address = $billing['address']['address'];
             $postcode = $billing['address']['postcode'];
             $city = $billing['address']['city'];
+            $country = $billing['address']['country'];
         }
 
         if (Minz_Request::isPost()) {
@@ -325,7 +327,7 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
                     'address' => $address,
                     'postcode' => $postcode,
                     'city' => $city,
-                    'country' => 'FR',
+                    'country' => $country,
                 );
                 $user_conf->billing = $billing;
                 if ($user_conf->save()) {
@@ -353,6 +355,7 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
         $this->view->address = $address;
         $this->view->postcode = $postcode;
         $this->view->city = $city;
+        $this->view->country = $country;
     }
 
     public function downloadInvoiceAction() {

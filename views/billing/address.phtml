@@ -95,9 +95,14 @@
         <div class="form-group">
             <div class="group-controls">
                 <p>
-                    <strong>France métropolitaine</strong>
+                    <?php if ($this->country === 'FR'): ?>
+                        <strong>France</strong>
+                    <?php elseif ($this->country === 'BE'): ?>
+                        <strong>Belgique</strong>
+                    <?php endif; ?>
+
                     <small>(vous habitez ailleurs&nbsp;?
-                    <a href="mailto:support@flus.io">Contactez-nous</a>)</small>
+                    <a href="mailto:support@flus.io">Contactez-moi</a>)</small>
                 </p>
             </div>
         </div>

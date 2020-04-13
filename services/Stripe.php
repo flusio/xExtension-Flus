@@ -140,6 +140,7 @@ class Stripe {
             'address1' => $address['address'],
             'postcode' => $address['postcode'],
             'city' => $address['city'],
+            'country' => $address['country'],
         ];
     }
 

@@ -78,11 +78,19 @@ class Invoice {
             'Payée le' => $this->delivery_date,
             'Identifiant client' => $this->client_username,
         ]);
-        $pdf->addClientInformation([
+
+        $client = [
             $this->address['first_name'] . ' ' . $this->address['last_name'],
             $this->address['address1'],
             $this->address['postcode'] . ' ' . $this->address['city'],
-        ]);
+        ];
+        if ($this->address['country'] === 'FR') {
+            $client[] = 'France';
+        } elseif ($this->address['country'] === 'BE') {
+            $client[] = 'Belgique';
+        }
+        $pdf->addClientInformation($client);
+
         if ($this->frequency === 'month') {
             $period = '1 mois';
         } else {
