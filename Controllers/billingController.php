@@ -1,7 +1,6 @@
 <?php
 
 use \Flus\services;
-use \Flus\models\Invoice;
 
 class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
     public function init() {
