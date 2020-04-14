@@ -21,7 +21,7 @@
 
     <div>
         <?php if ($this->waiting_payment_id) { ?>
-            <a class="btn btn-important" href="<?= _url('billing', 'pay') ?>">
+            <a class="btn btn-important" href="<?= _url('billing', 'check', 'id', $this->waiting_payment_id) ?>">
                 Vérifier l’état de votre paiement en attente
             </a>
         <?php } elseif ($this->subscription_end_is_soon) { ?>
@@ -67,7 +67,7 @@
             <tbody>
                 <?php foreach ($this->payments as $payment) { ?>
                     <tr>
-                        <td><?= timestamptodate($payment['date']) ?></td>
+                        <td><?= timestamptodate($payment['created_at']) ?></td>
 
                         <td>
                             <?php if ($payment['frequency'] === 'month') { ?>
@@ -77,24 +77,20 @@
                             <?php } ?>
                         </td>
 
-                        <td class="numeric"><?= $payment['amount'] ?>&nbsp;€</td>
+                        <td class="numeric"><?= $payment['amount'] / 100 ?>&nbsp;€</td>
 
                         <td>
-                            <?php if ($payment['status'] === 'waiting') { ?>
-                                <strong>en attente</strong>
-                            <?php } elseif ($payment['status'] === 'paid') { ?>
+                            <?php if ($payment['completed_at']) { ?>
                                 payé ✔
-                            <?php } elseif ($payment['status'] === 'canceled') { ?>
-                                annulé
                             <?php } else { ?>
-                                <?= $payment['status'] ?>
+                                <strong>en attente</strong>
                             <?php } ?>
                         </td>
 
                         <td>
-                            <?php if ($payment['invoice_number']) { ?>
+                            <?php if ($payment['completed_at']) { ?>
                                 <a
-                                    href="<?= _url('billing', 'downloadInvoice', 'number', $payment['invoice_number']) ?>"
+                                    href="<?= _url('billing', 'downloadInvoice', 'id', $payment['id']) ?>"
                                     target="_blank"
                                     rel="noreferrer"
                                 >

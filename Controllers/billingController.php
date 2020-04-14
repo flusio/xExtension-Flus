@@ -1,6 +1,6 @@
 <?php
 
-use \Flus\services\Stripe;
+use \Flus\services;
 use \Flus\models\Invoice;
 
 class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
@@ -29,7 +29,7 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
 
         $waiting_payment_id = null;
         foreach ($billing['payments'] as $id => $payment) {
-            if ($payment['status'] === 'waiting') {
+            if (!$payment['completed_at']) {
                 $waiting_payment_id = $id;
                 break;
             }
@@ -46,16 +46,10 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
 
         $user_conf = FreshRSS_Context::$user_conf;
         $payments = $user_conf->billing['payments'];
-        $payments = array_filter(
-            $payments,
-            function($payment) {
-                return $payment['status'] !== 'canceled';
-            }
-        );
         uasort(
             $payments,
             function ($payment1, $payment2) {
-                return $payment2['date'] - $payment1['date'];
+                return $payment2['created_at'] - $payment1['created_at'];
             }
         );
 
@@ -169,45 +163,64 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
             $user_conf->billing = $billing;
             $user_conf->save();
 
-            if ($frequency === 'month') {
-                $amount = $this->view->month_price;
-            } else {
-                $amount = $this->view->year_price;
-            }
+            $payment_service = new services\Payment($system_conf->billing['flus_private_key']);
 
             $username = Minz_Session::param('currentUser', '_');
-
-            Stripe::init($system_conf->billing['stripe_secret_key']);
-            $payment_service = Stripe::create($username, $frequency, $amount);
-            $payment_service->syncStatus();
-            $payment_service->save();
-
-            Minz_Request::forward(
-                ['c' => 'billing', 'a' => 'pay'], true
+            $email = $user_conf->mail_login;
+            $payment = $payment_service->createSession(
+                $username,
+                $email,
+                $frequency,
+                $billing['address']
             );
+
+            if ($payment) {
+                $billing['payments'][$payment['id']] = $payment;
+                $user_conf->billing = $billing;
+                $user_conf->save();
+
+                Minz_Request::forward($payment_service->payUrl($payment), true);
+            } else {
+                $this->view->notification = [
+                    'type' => 'bad',
+                    'content' => 'Une erreur est survenue lors du paiement, vous pouvez contacter le support pour en savoir plus.',
+                ];
+            }
         }
     }
 
-    public function payAction() {
-        $system_conf = FreshRSS_Context::$system_conf;
-        $waiting_payment_id = $this->view->waiting_payment_id;
-        if ($waiting_payment_id === null) {
-            Minz_Request::forward(array(
-                'c' => 'billing',
-                'a' => 'index',
-            ), true);
+    public function checkAction() {
+        if (!FreshRSS_Auth::hasAccess()) {
+            Minz_Error::error(403);
         }
 
-        $this->_csp([
-            'default-src' => "'self' js.stripe.com",
-            'script-src' => "'self' 'unsafe-inline' js.stripe.com",
-        ]);
+        invalidateHttpCache();
 
-        Minz_View::appendScript('https://js.stripe.com/v3/', false, true, false);
+        $payment_id = Minz_Request::param('id');
 
-        $this->view->_layout('redirection');
-        $this->view->stripe_public_key = $system_conf->billing['stripe_public_key'];
-        $this->view->checkout_session_id = $waiting_payment_id;
+        $system_conf = FreshRSS_Context::$system_conf;
+        $user_conf = FreshRSS_Context::$user_conf;
+        $billing = $user_conf->billing;
+
+        $payment_service = new services\Payment($system_conf->billing['flus_private_key']);
+        $payment = $payment_service->retrievePayment($payment_id);
+
+        if ($payment) {
+            $billing['payments'][$payment['id']] = $payment;
+            $user_conf->billing = $billing;
+            $user_conf->save();
+
+            if ($payment['completed_at']) {
+                $this->extendSubscription($user_conf, $payment['frequency']);
+            } else {
+                Minz_Request::forward($payment_service->payUrl($payment), true);
+            }
+        }
+
+        Minz_Request::forward(array(
+            'c' => 'billing',
+            'a' => 'index',
+        ), true);
     }
 
     public function successAction() {
@@ -226,26 +239,36 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
         }
 
         $system_conf = FreshRSS_Context::$system_conf;
-        Stripe::init($system_conf->billing['stripe_secret_key']);
+        $user_conf = FreshRSS_Context::$user_conf;
+        $billing = $user_conf->billing;
 
-        $payment_service = Stripe::retrieve($waiting_payment_id);
-        $payment_service->syncStatus();
-        $payment_service->save();
+        $payment_service = new services\Payment($system_conf->billing['flus_private_key']);
+        $payment = $payment_service->retrievePayment($waiting_payment_id);
 
-        if ($payment_service->isPaid()) {
-            $payment_service->approve();
-            $payment_service->generateInvoice();
-        }
+        if ($payment) {
+            $billing['payments'][$payment['id']] = $payment;
+            $user_conf->billing = $billing;
+            $user_conf->save();
 
-        if ($payment_service->isPaid()) {
-            Minz_View::prependTitle('Validation du paiement · ');
-        } elseif ($payment_service->isWaiting()) {
-            Minz_View::prependTitle('Prise en compte du paiement · ');
+            if ($payment['completed_at']) {
+                $this->extendSubscription($user_conf, $payment['frequency']);
+
+                Minz_View::prependTitle('Validation du paiement · ');
+            } else {
+                Minz_View::prependTitle('Prise en compte du paiement · ');
+            }
+
+            $this->view->payment = $payment;
         } else {
-            Minz_View::prependTitle('Échec du paiement · ');
-        }
+            Minz_Log::error(
+                "Tried to access {$waiting_payment_id} payment, but it seems to don't exist."
+            );
 
-        $this->view->payment = $payment_service->payment();
+            Minz_Request::forward(array(
+                'c' => 'billing',
+                'a' => 'index',
+            ), true);
+        }
     }
 
     public function cancelAction() {
@@ -263,14 +286,17 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
             ), true);
         }
 
-        $system_conf = FreshRSS_Context::$system_conf;
-        Stripe::init($system_conf->billing['stripe_secret_key']);
-        $payment_service = Stripe::retrieve($waiting_payment_id);
-        $payment_service->cancel();
-        $payment_service->save();
+        $user_conf = FreshRSS_Context::$user_conf;
+        $billing = $user_conf->billing;
+
+        if (isset($billing['payments'][$waiting_payment_id])) {
+            unset($billing['payments'][$waiting_payment_id]);
+        }
+
+        $user_conf->billing = $billing;
+        $user_conf->save();
 
         Minz_View::prependTitle('Annulation du paiement · ');
-        $this->view->payment = $payment_service->payment();
     }
 
     public function addressAction() {
@@ -363,33 +389,67 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
             Minz_Error::error(403);
         }
 
-        $requested_invoice_number = Minz_Request::param('number', '');
+        $payment_id = Minz_Request::param('id');
 
+        $system_conf = FreshRSS_Context::$system_conf;
         $user_conf = FreshRSS_Context::$user_conf;
         $payments = $user_conf->billing['payments'];
-        $user_invoice_numbers = array_column($payments, 'invoice_number');
 
-        if (!in_array($requested_invoice_number, $user_invoice_numbers)) {
+        if (!isset($payments[$payment_id])) {
             // The user doesn't own the requested invoice
             $username = Minz_Session::param('currentUser', '_');
-            Minz_Log::warning("${username} tried to access {$requested_invoice_number} invoice PDF file.", ADMIN_LOG);
+            Minz_Log::warning("${username} tried to access {$payment_id} invoice PDF file.", ADMIN_LOG);
             Minz_Error::error(403);
         }
 
-        $invoice_pdf_path = Invoice::getPdfPath($requested_invoice_number);
-        if (!file_exists($invoice_pdf_path)) {
-            Minz_Log::warning("Invoice n°{$requested_invoice_number} PDF file does not exist.");
-            Minz_Error::error(404);
-        }
-
-        if (!is_readable($invoice_pdf_path)) {
-            Minz_Log::warning("Invoice n°{$requested_invoice_number} PDF file is not readable.");
-            Minz_Error::error(404);
-        }
-
+        $payment_service = new services\Payment($system_conf->billing['flus_private_key']);
         $this->view->_layout(false);
-        header('Content-Type: application/pdf');
-        header('Content-Disposition: inline; filename="' . $file_name . '"');
-        readfile($invoice_pdf_path);
+        $invoice = $payment_service->retrieveInvoice($payment_id);
+
+        if ($invoice) {
+            $date = date('Y-m-d');
+            $filename = "{$date}_facture_Flus.pdf";
+            header('Content-Type: application/pdf');
+            header('Content-Disposition: inline; filename="' . $filename . '"');
+            echo $invoice;
+        } else {
+            Minz_Error::error(404);
+        }
+    }
+
+    /**
+     * Extend the subscription_end_at attribute of the given user.
+     *
+     * @param \Minz_Configuration $user_conf
+     * @param string $frequency `month` or `year`
+     *
+     * @return boolean
+     */
+    private function extendSubscription($user_conf, $frequency) {
+        $billing = $user_conf->billing;
+
+        $current_subscription_end_at = $billing['subscription_end_at'];
+
+        // no need to renew a user with a free plan (subscription_end_at === null)
+        if ($current_subscription_end_at !== null) {
+            if ($frequency === 'year') {
+                $interval = '1 year';
+            } else {
+                $interval = '1 month';
+            }
+
+            $today = time();
+            $base_date_renewal = max($today, $current_subscription_end_at);
+
+            $subscription_end_at = date_create()->setTimestamp($base_date_renewal);
+            date_add(
+                $subscription_end_at, date_interval_create_from_date_string($interval)
+            );
+            $billing['subscription_end_at'] = $subscription_end_at->getTimestamp();
+            $user_conf->billing = $billing;
+            return $user_conf->save();
+        }
+
+        return true;
     }
 }

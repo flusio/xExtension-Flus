@@ -5,7 +5,7 @@
 ?>
 
 <div class="post">
-    <?php if ($this->payment['status'] === 'paid') { ?>
+    <?php if ($this->payment['completed_at']) { ?>
         <h1>Validation du paiement</h1>
 
         <p>
@@ -14,7 +14,7 @@
             <?= $this->payment['frequency'] === 'month' ? 'd’un mois.' : 'd’une année.' ?>
         </p>
 
-    <?php } elseif ($this->payment['status'] === 'waiting') { ?>
+    <?php } else { ?>
         <h1>Prise en compte du paiement</h1>
 
         <p>
@@ -24,14 +24,6 @@
 
         <p>
             <a class="btn" href="<?= _url('billing', 'success') ?>">Rafraîchir la page</a>
-        </p>
-
-    <?php } else { ?>
-        <h1>Erreur de paiement</h1>
-
-        <p>
-            Une erreur est survenue lors du paiement, nous n’avons pas pu
-            valider votre commande. Il ne vous sera donc rien débité.
         </p>
     <?php } ?>
 
