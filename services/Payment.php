@@ -3,7 +3,7 @@
 namespace Flus\services;
 
 class Payment {
-    const API_HOST = 'https://next.flus.io';
+    const API_HOST = 'https://flus.fr';
 
     /** @var string */
     private $private_key;
