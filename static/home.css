@@ -202,3 +202,13 @@ img.illustration:hover {
 .fl-app .fl-app-links {
     font-size: .9rem;
 }
+
+/* Misc */
+.new-flus {
+    margin-bottom: 1rem;
+    padding: 1rem;
+
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-align: center;
+}
