@@ -1,6 +1,7 @@
 <?php
 
 use \Flus\services;
+use \Flus\utils;
 
 class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
     public function init() {
@@ -150,6 +151,7 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
         $this->view->year_price = $system_conf->billing['year_price'];
         $this->view->subscription_frequency = $billing['subscription_frequency'];
         $this->view->address = $billing['address'];
+        $this->view->countryLabel = utils\Countries::codeToLabel($billing['address']['country']);
 
         if (Minz_Request::isPost()) {
             $frequency = Minz_Request::param('frequency', 'month');
@@ -338,13 +340,15 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
             $address = Minz_Helper::htmlspecialchars_utf8(trim(Minz_Request::param('address', '')));
             $postcode = Minz_Helper::htmlspecialchars_utf8(trim(Minz_Request::param('postcode', '')));
             $city = Minz_Helper::htmlspecialchars_utf8(trim(Minz_Request::param('city', '')));
+            $country = Minz_Helper::htmlspecialchars_utf8(trim(Minz_Request::param('country', '')));
 
             if (
                 $first_name != '' &&
                 $last_name != '' &&
                 $address != '' &&
                 $postcode != '' &&
-                $city != ''
+                $city != '' &&
+                utils\Countries::isSupported($country)
             ) {
                 $billing['address'] = array(
                     'first_name' => $first_name,
@@ -381,6 +385,7 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
         $this->view->postcode = $postcode;
         $this->view->city = $city;
         $this->view->country = $country;
+        $this->view->countries = utils\Countries::listSorted();
     }
 
     public function downloadInvoiceAction() {

@@ -62,6 +62,7 @@ class Payment {
             'address[address1]' => $address['address'],
             'address[postcode]' => $address['postcode'],
             'address[city]' => $address['city'],
+            'address[country]' => $address['country'],
         ]);
 
         $result = curl_exec($curl_session);

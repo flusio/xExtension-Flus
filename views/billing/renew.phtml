@@ -61,10 +61,8 @@
                 <address>
                     <?= $this->address['first_name'] . ' ' . $this->address['last_name'] ?><br />
                     <?= $this->address['address'] ?><br />
-                    <?= $this->address['postcode'] . ' ' . $this->address['city'] ?>
-                    <?php if ($this->address['country'] === 'BE'): ?>
-                        <br />Belgique
-                    <?php endif; ?>
+                    <?= $this->address['postcode'] . ' ' . $this->address['city'] ?><br />
+                    <?= $this->countryLabel ?>
                 </address>
 
                 <a href="<?= _url('billing', 'address') ?>">Modifier</a>

@@ -93,17 +93,22 @@
         </div>
 
         <div class="form-group">
-            <div class="group-controls">
-                <p>
-                    <?php if ($this->country === 'FR'): ?>
-                        <strong>France</strong>
-                    <?php elseif ($this->country === 'BE'): ?>
-                        <strong>Belgique</strong>
-                    <?php endif; ?>
+            <label class="group-name" for="country">
+                Pays
+            </label>
 
-                    <small>(vous habitez ailleurs&nbsp;?
-                    <a href="mailto:support@flus.io">Contactez-moi</a>)</small>
-                </p>
+            <div class="group-controls">
+                <select
+                    id="country"
+                    name="country"
+                    required
+                >
+                    <?php foreach ($this->countries as $code => $label): ?>
+                        <option value="<?= $code ?>" <?= $this->country === $code ? 'selected' : '' ?>>
+                            <?= $label ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
             </div>
         </div>
 
