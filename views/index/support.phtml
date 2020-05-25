@@ -1,0 +1,57 @@
+<div class="content medium">
+    <a href="<?= _url('index', 'index'); ?>">
+        <?= _t('gen.action.back_to_rss_feeds'); ?>
+    </a>
+
+    <h1>Aide et support</h1>
+
+    <p>
+        Vous rencontrez un problème, avez une question ou souhaitez simplement
+        en savoir plus sur le service&nbsp;? Vous pouvez m’écrire directement
+        depuis ce formulaire.
+    </p>
+
+    <form class="fl-support-form" method="post">
+        <input type="hidden" name="_csrf" value="<?php echo FreshRSS_Auth::csrfToken(); ?>" />
+
+        <div class="form-group">
+            <label class="group-name" for="subject">
+                Sujet
+            </label>
+
+            <div class="group-controls">
+                <input
+                    type="text"
+                    name="subject"
+                    id="subject"
+                    required
+                    value="<?= $this->subject ?>"
+                />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="group-name" for="content">
+                Votre message
+            </label>
+
+            <div class="group-controls">
+                <textarea name="content" id="content" required><?= $this->content ?></textarea>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <p class="group-controls">
+                Adresse de contact&nbsp;: <?= $this->email ?>
+            </p>
+        </div>
+
+        <div class="form-group form-actions">
+            <div class="group-controls">
+                <button type="submit" class="btn btn-important">
+                    Envoyer votre message
+                </button>
+            </div>
+        </div>
+    </form>
+</div>

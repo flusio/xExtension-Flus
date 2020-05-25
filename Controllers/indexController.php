@@ -37,6 +37,41 @@ class FreshExtension_index_Controller extends FreshRSS_index_Controller {
         }
     }
 
+    public function supportAction() {
+        if (!FreshRSS_Auth::hasAccess()) {
+            Minz_Error::error(404);
+        }
+
+        $email = FreshRSS_Context::$user_conf->mail_login;
+        $this->view->email = $email;
+        $this->view->subject = '';
+        $this->view->content = '';
+        Minz_View::prependTitle('Aide et support · ');
+
+        if (Minz_Request::isPost()) {
+            $subject = trim(Minz_Request::param('subject'));
+            $content = trim(Minz_Request::param('content'));
+            $this->view->subject = $subject;
+            $this->view->content = $content;
+
+            if (!$subject || !$content) {
+                $this->view->notification = [
+                    'type' => 'bad',
+                    'content' => 'Les deux champs sont obligatoires.',
+                ];
+                return;
+            }
+
+            $mailer = new \Flus\mailers\Support();
+            $mailer->send_message($email, $subject, $content);
+
+            Minz_Request::good('Votre message a bien été envoyé', array(
+                'c' => 'index',
+                'a' => 'support',
+            ));
+        }
+    }
+
     public function aboutAction() {
         $this->view->about = file_get_contents($this->extension->getPath() . '/legals/about.html');
         $this->view->can_register = !max_registrations_reached();

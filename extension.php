@@ -45,6 +45,7 @@ class FlusExtension extends Minz_Extension {
         $this->registerViews();
 
         $this->registerHook('menu_configuration_entry', array('FlusExtension', 'getMenuEntry'));
+        $this->registerHook('menu_other_entry', array('FlusExtension', 'getSupportEntry'));
         $this->registerHook('freshrss_init', array('FlusExtension', 'initBillingConfiguration'));
         $this->registerHook('freshrss_init', array('FlusExtension', 'blockIfOverdue'));
 
@@ -59,6 +60,18 @@ class FlusExtension extends Minz_Extension {
         }
         $url = _url('billing', 'index');
         $label = 'Facturation';
+
+        return "<li class=\"item$active_class\"><a href=\"$url\">$label</a></li>";
+    }
+
+    public static function getSupportEntry() {
+        if (Minz_Request::is('index', 'support')) {
+            $active_class = ' active';
+        } else {
+            $active_class = '';
+        }
+        $url = _url('index', 'support');
+        $label = 'Aide et support';
 
         return "<li class=\"item$active_class\"><a href=\"$url\">$label</a></li>";
     }

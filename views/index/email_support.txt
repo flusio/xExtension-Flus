@@ -1,0 +1,3 @@
+Nouveau message depuis le formulaire de <?= $this->from ?>.
+
+<?= $this->content ?>

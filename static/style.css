@@ -110,3 +110,13 @@
 .fl-payments-table td:first-child {
     padding-left: 1rem;
 }
+
+/* Support form */
+.fl-support-form input {
+    width: 100%;
+}
+
+.fl-support-form textarea {
+    width: 100%;
+    min-height: 250px;
+}
