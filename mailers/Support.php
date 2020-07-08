@@ -15,4 +15,16 @@ class Support extends \Minz_Mailer {
             $subject_prefix . ' ' . $subject
         );
     }
+
+    public function send_notification($to, $subject) {
+        $this->view->_path('index/email_notification.txt');
+
+        $this->view->subject = $subject;
+
+        $subject_prefix = '[' . \FreshRSS_Context::$system_conf->title . ']';
+        return $this->mail(
+            $to,
+            $subject_prefix . ' Votre message a bien été envoyé'
+        );
+    }
 }

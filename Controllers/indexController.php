@@ -64,6 +64,7 @@ class FreshExtension_index_Controller extends FreshRSS_index_Controller {
 
             $mailer = new \Flus\mailers\Support();
             $mailer->send_message($email, $subject, $content);
+            $mailer->send_notification($email, $subject);
 
             Minz_Request::good('Votre message a bien été envoyé', array(
                 'c' => 'index',
