@@ -81,8 +81,6 @@ class FlusExtension extends Minz_Extension {
         if ($user_conf && !is_array($user_conf->billing)) {
             $user_conf->billing = array(
                 'subscription_end_at' => strtotime("+1 month"),
-                'subscription_frequency' => 'month',
-                'payments' => array(),
             );
             $user_conf->save();
         }
