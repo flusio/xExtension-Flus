@@ -33,21 +33,6 @@
                 Renouveler
             </a>
         <?php } ?>
-
-        <?php if ($this->subscription_end_at !== null) { ?>
-            <form class="form-billing-reminder" method="post" action="<?= _url('billing', 'reminder') ?>">
-                <input type="hidden" name="_csrf" value="<?php echo FreshRSS_Auth::csrfToken(); ?>" />
-                <label for="reminder" class="checkbox">
-                    <input
-                        type="checkbox"
-                        name="reminder"
-                        id="reminder"
-                        <?= $this->reminder ? 'checked' : '' ?>
-                    />
-                    Activer le rappel par courriel à l’approche de l’échéance
-                </label>
-            </form>
-        <?php } ?>
     </div>
 
     <?php if (!empty($this->payments)) { ?>

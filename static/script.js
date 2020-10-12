@@ -30,15 +30,6 @@
         });
     }
 
-    // Autosubmit the reminder form when checkbox is checked
-    var reminderForm = document.querySelector('.form-billing-reminder');
-    if (reminderForm) {
-        var reminderCheckbox = reminderForm.querySelector('#reminder');
-        reminderCheckbox.addEventListener('change', function () {
-            reminderForm.submit();
-        });
-    }
-
     // Manage the billing renew form
     var monthPrice = document.getElementById('renew-amount-month');
     var yearPrice = document.getElementById('renew-amount-year');

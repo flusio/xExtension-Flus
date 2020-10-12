@@ -20,12 +20,6 @@
     margin-left: 1.5rem;
 }
 
-/* Billing reminder */
-.form-billing-reminder,
-.form-billing-reminder label {
-    display: inline-block;
-}
-
 /* Auth form */
 .formLogin form #use-username-info {
     width: 100%;
