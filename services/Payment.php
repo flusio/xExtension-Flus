@@ -127,41 +127,6 @@ class Payment {
     }
 
     /**
-     * Get invoice for a given payment id
-     *
-     * @param string $id
-     *
-     * @return 
-     */
-    public function retrieveInvoice($id)
-    {
-        $curl_session = curl_init();
-        $url = self::API_HOST . '/invoices/pdf/' . $id;
-        curl_setopt($curl_session, CURLOPT_URL, $url);
-        curl_setopt($curl_session, CURLOPT_HEADER, false);
-        curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl_session, CURLOPT_TIMEOUT, 5);
-        curl_setopt($curl_session, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-        curl_setopt($curl_session, CURLOPT_USERPWD, $this->private_key . ':');
-
-        $result = curl_exec($curl_session);
-        $http_code = curl_getinfo($curl_session, CURLINFO_RESPONSE_CODE);
-
-        if ($result === false) {
-            $error = curl_error($curl_session);
-            \Minz_Log::error("Invoice retrieve failed: {$error}.");
-        }
-
-        if ($http_code < 200 || $http_code >= 300) {
-            \Minz_Log::error("Invoice retrieve failed, HTTP code {$http_code}.");
-        }
-
-        curl_close($curl_session);
-
-        return $result;
-    }
-
-    /**
      * Return the URL to pay a Payment on Flus
      *
      * @param array $payment

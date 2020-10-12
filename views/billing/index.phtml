@@ -45,7 +45,6 @@
                     <th class="frequency">Période</th>
                     <th class="amount">Prix</th>
                     <th class="status">État</th>
-                    <th class="invoice">Facture</th>
                 </th>
             </thead>
 
@@ -69,18 +68,6 @@
                                 payé ✔
                             <?php } else { ?>
                                 <strong>en attente</strong>
-                            <?php } ?>
-                        </td>
-
-                        <td>
-                            <?php if ($payment['completed_at']) { ?>
-                                <a
-                                    href="<?= _url('billing', 'downloadInvoice', 'id', $payment['id']) ?>"
-                                    target="_blank"
-                                    rel="noreferrer"
-                                >
-                                    Télécharger
-                                </a>
                             <?php } ?>
                         </td>
                     </tr>

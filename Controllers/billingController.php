@@ -336,39 +336,6 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
         $this->view->countries = utils\Countries::listSorted();
     }
 
-    public function downloadInvoiceAction() {
-        if (!FreshRSS_Auth::hasAccess()) {
-            Minz_Error::error(403);
-        }
-
-        $payment_id = Minz_Request::param('id');
-
-        $system_conf = FreshRSS_Context::$system_conf;
-        $user_conf = FreshRSS_Context::$user_conf;
-        $payments = $user_conf->billing['payments'];
-
-        if (!isset($payments[$payment_id])) {
-            // The user doesn't own the requested invoice
-            $username = Minz_Session::param('currentUser', '_');
-            Minz_Log::warning("${username} tried to access {$payment_id} invoice PDF file.", ADMIN_LOG);
-            Minz_Error::error(403);
-        }
-
-        $payment_service = new services\Payment($system_conf->billing['flus_private_key']);
-        $this->view->_layout(false);
-        $invoice = $payment_service->retrieveInvoice($payment_id);
-
-        if ($invoice) {
-            $date = date('Y-m-d');
-            $filename = "{$date}_facture_Flus.pdf";
-            header('Content-Type: application/pdf');
-            header('Content-Disposition: inline; filename="' . $filename . '"');
-            echo $invoice;
-        } else {
-            Minz_Error::error(404);
-        }
-    }
-
     /**
      * Extend the subscription_end_at attribute of the given user.
      *
