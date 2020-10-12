@@ -78,11 +78,4 @@ class FreshExtension_index_Controller extends FreshRSS_index_Controller {
         $this->view->can_register = !max_registrations_reached();
         Minz_View::prependTitle(_t('index.about.title') . ' · ');
     }
-
-    public function cgvAction() {
-        $this->view->cgv = file_get_contents($this->extension->getPath() . '/legals/cgv.html');
-        $this->view->is_connected = FreshRSS_Auth::hasAccess();
-        $this->view->can_register = !max_registrations_reached();
-        Minz_View::prependTitle('Conditions Générales de Vente · ');
-    }
 }

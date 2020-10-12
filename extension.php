@@ -118,7 +118,6 @@ class FlusExtension extends Minz_Extension {
         $action_is_allowed = (
             Minz_Request::is('index', 'about') ||
             Minz_Request::is('index', 'tos') ||
-            Minz_Request::is('index', 'cgv') ||
             Minz_Request::is('auth', 'logout') ||
             Minz_Request::is('feed', 'actualize') ||
             Minz_Request::controllerName() === 'billing'
