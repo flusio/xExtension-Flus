@@ -83,4 +83,43 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
             ], true);
         }
     }
+
+    public function syncAction()
+    {
+        if (!FreshRSS_Auth::hasAccess()) {
+            Minz_Error::error(403);
+        }
+
+        $user_conf = FreshRSS_Context::$user_conf;
+        $subscription = $user_conf->subscription;
+        if (empty($subscription['account_id'])) {
+            Minz_Log::error("Le compte de paiement de {$user_conf->mail_login} n’a pas été initialisé.");
+            return Minz_Request::bad('Votre compte de paiement n’a pas encore été initialisé.', [
+                'c' => 'billing',
+                'a' => 'index',
+            ], true);
+        }
+
+        $flus_private_key = FreshRSS_Context::$system_conf->billing['flus_private_key'];
+        $subscriptions_service = new \Flus\services\Subscriptions($flus_private_key);
+        $account_id = $subscription['account_id'];
+
+        $response = $subscriptions_service->expiredAt($account_id);
+        if (!$response) {
+            Minz_Log::error("Une erreur est survenue lors de la synchronisation du compte de paiement {$account_id}.");
+            return Minz_Request::bad('Une erreur est survenue lors de la synchronisation.', [
+                'c' => 'billing',
+                'a' => 'index',
+            ], true);
+        }
+
+        $subscription['expired_at'] = $response['expired_at'];
+        $user_conf->subscription = $subscription;
+        $user_conf->save();
+
+        return Minz_Request::good('La date d’expiration a été synchronisée.', [
+            'c' => 'billing',
+            'a' => 'index',
+        ], true);
+    }
 }
