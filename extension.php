@@ -59,7 +59,7 @@ class FlusExtension extends Minz_Extension {
             $active_class = '';
         }
         $url = _url('billing', 'index');
-        $label = 'Facturation';
+        $label = 'Abonnement Flus';
 
         return "<li class=\"item$active_class\"><a href=\"$url\">$label</a></li>";
     }
@@ -78,10 +78,11 @@ class FlusExtension extends Minz_Extension {
 
     public static function initBillingConfiguration() {
         $user_conf = FreshRSS_Context::$user_conf;
-        if ($user_conf && !is_array($user_conf->billing)) {
-            $user_conf->billing = array(
-                'subscription_end_at' => strtotime("+1 month"),
-            );
+        if ($user_conf && !is_array($user_conf->subscription)) {
+            $user_conf->subscription = [
+                'account_id' => null,
+                'expired_at' => strtotime("+1 month"),
+            ];
             $user_conf->save();
         }
 
@@ -107,14 +108,16 @@ class FlusExtension extends Minz_Extension {
             return;
         }
 
-        $today = time();
-        $subscription_end_at = $user_conf->billing['subscription_end_at'];
-        if ($subscription_end_at === null) {
-            // Free plan
+        $today = new \DateTime();
+        $subscription = $user_conf->subscription;
+        $expired_at = date_create_from_format('Y-m-d H:i:sP', $subscription['expired_at']);
+
+        $free_account = $expired_at->getTimestamp() === 0;
+        if ($free_account) {
             return;
         }
 
-        $subscription_is_overdue = $today >= $subscription_end_at;
+        $subscription_is_overdue = $today >= $expired_at;
         $action_is_allowed = (
             Minz_Request::is('index', 'about') ||
             Minz_Request::is('index', 'tos') ||
