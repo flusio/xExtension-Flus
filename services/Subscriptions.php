@@ -23,11 +23,10 @@ class Subscriptions {
      * @param \DateTime|null $expired_at
      * @param boolean|null $reminder
      *
-     * @return array
+     * @return array|null
      */
     public function getAccount($email, $expired_at = null, $reminder = null)
     {
-        $url = self::API_HOST . '/account';
         $params = [
             'email' => $email,
         ];
@@ -38,33 +37,7 @@ class Subscriptions {
             $params['reminder'] = $reminder;
         }
 
-        $curl_session = curl_init();
-        curl_setopt($curl_session, CURLOPT_URL, $url . '?' . http_build_query($params));
-        curl_setopt($curl_session, CURLOPT_HEADER, false);
-        curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl_session, CURLOPT_TIMEOUT, 5);
-        curl_setopt($curl_session, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-        curl_setopt($curl_session, CURLOPT_USERPWD, $this->private_key . ':');
-
-        $result = curl_exec($curl_session);
-        $http_code = curl_getinfo($curl_session, CURLINFO_RESPONSE_CODE);
-
-        if ($result === false) {
-            $error = curl_error($curl_session);
-            \Minz_Log::error("getAccount failed: {$error}.");
-        }
-
-        if ($http_code < 200 || $http_code >= 300) {
-            \Minz_Log::error("getAccount failed, HTTP code {$http_code}.");
-        }
-
-        curl_close($curl_session);
-
-        if ($result !== false) {
-            return json_decode($result, true);
-        } else {
-            return null;
-        }
+        return $this->get('/account', $params);
     }
 
     /**
@@ -72,39 +45,15 @@ class Subscriptions {
      *
      * @param string $account_id
      *
-     * @return array
+     * @return string|null
      */
     public function loginUrl($account_id)
     {
-        $url = self::API_HOST . '/account/login-url';
-        $params = [
+        $response = $this->get('/account/login-url', [
             'account_id' => $account_id,
-        ];
-
-        $curl_session = curl_init();
-        curl_setopt($curl_session, CURLOPT_URL, $url . '?' . http_build_query($params));
-        curl_setopt($curl_session, CURLOPT_HEADER, false);
-        curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl_session, CURLOPT_TIMEOUT, 5);
-        curl_setopt($curl_session, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-        curl_setopt($curl_session, CURLOPT_USERPWD, $this->private_key . ':');
-
-        $result = curl_exec($curl_session);
-        $http_code = curl_getinfo($curl_session, CURLINFO_RESPONSE_CODE);
-
-        if ($result === false) {
-            $error = curl_error($curl_session);
-            \Minz_Log::error("loginUrl failed: {$error}.");
-        }
-
-        if ($http_code < 200 || $http_code >= 300) {
-            \Minz_Log::error("loginUrl failed, HTTP code {$http_code}.");
-        }
-
-        curl_close($curl_session);
-
-        if ($result !== false) {
-            return json_decode($result, true);
+        ]);
+        if ($response) {
+            return $response['url'];
         } else {
             return null;
         }
@@ -115,17 +64,35 @@ class Subscriptions {
      *
      * @param string $account_id
      *
-     * @return array
+     * @return string|null
      */
     public function expiredAt($account_id)
     {
-        $url = self::API_HOST . '/account/expired-at';
-        $params = [
+        $response = $this->get('/account/expired-at', [
             'account_id' => $account_id,
-        ];
+        ]);
+        if ($response) {
+            return $response['expired_at'];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * @param string $endpoint
+     * @param mixed[] $params
+     *
+     * @return array|null
+     */
+    private function get($endpoint, $params = [])
+    {
+        $url = self::API_HOST . $endpoint;
+        if ($params) {
+            $url = $url . '?' . http_build_query($params);
+        }
 
         $curl_session = curl_init();
-        curl_setopt($curl_session, CURLOPT_URL, $url . '?' . http_build_query($params));
+        curl_setopt($curl_session, CURLOPT_URL, $url);
         curl_setopt($curl_session, CURLOPT_HEADER, false);
         curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl_session, CURLOPT_TIMEOUT, 5);
@@ -137,11 +104,11 @@ class Subscriptions {
 
         if ($result === false) {
             $error = curl_error($curl_session);
-            \Minz_Log::error("expiredAt failed: {$error}.");
+            \Minz_Log::error("services/Subscriptions#get {$endpoint} failed: {$error}.");
         }
 
         if ($http_code < 200 || $http_code >= 300) {
-            \Minz_Log::error("expiredAt failed, HTTP code {$http_code}.");
+            \Minz_Log::error("services/Subscriptions#get {$endpoint} failed, HTTP code {$http_code}.");
         }
 
         curl_close($curl_session);

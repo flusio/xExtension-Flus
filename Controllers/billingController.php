@@ -72,9 +72,9 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
         $subscriptions_service = new \Flus\services\Subscriptions($flus_private_key);
         $account_id = $subscription['account_id'];
 
-        $response = $subscriptions_service->loginUrl($account_id);
-        if ($response) {
-            return Minz_Request::forward($response['url'], true);
+        $url = $subscriptions_service->loginUrl($account_id);
+        if ($url) {
+            return Minz_Request::forward($url, true);
         } else {
             Minz_Log::error("Une erreur est survenue lors de la connexion du compte de paiement {$account_id}.");
             return Minz_Request::bad('Une erreur est survenue lors de la connexion au compte de paiement.', [
@@ -104,8 +104,8 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
         $subscriptions_service = new \Flus\services\Subscriptions($flus_private_key);
         $account_id = $subscription['account_id'];
 
-        $response = $subscriptions_service->expiredAt($account_id);
-        if (!$response) {
+        $expired_at = $subscriptions_service->expiredAt($account_id);
+        if (!$expired_at) {
             Minz_Log::error("Une erreur est survenue lors de la synchronisation du compte de paiement {$account_id}.");
             return Minz_Request::bad('Une erreur est survenue lors de la synchronisation.', [
                 'c' => 'billing',
@@ -113,7 +113,7 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
             ], true);
         }
 
-        $subscription['expired_at'] = $response['expired_at'];
+        $subscription['expired_at'] = $expired_at;
         $user_conf->subscription = $subscription;
         $user_conf->save();
 
