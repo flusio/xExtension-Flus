@@ -77,6 +77,17 @@ class FlusExtension extends Minz_Extension {
     }
 
     public static function initBillingConfiguration() {
+        // Initialize the basic pricing info
+        $system_conf = FreshRSS_Context::$system_conf;
+        if ($system_conf && !is_array($system_conf->billing)) {
+            $system_conf->billing = array(
+                'month_price' => 5,
+                'year_price' => 50,
+            );
+            $system_conf->save();
+        }
+
+        // Initialize the basic subscription info for all the users
         $user_conf = FreshRSS_Context::$user_conf;
         if ($user_conf && !is_array($user_conf->subscription)) {
             $user_conf->subscription = [
@@ -86,13 +97,24 @@ class FlusExtension extends Minz_Extension {
             $user_conf->save();
         }
 
-        $system_conf = FreshRSS_Context::$system_conf;
-        if ($system_conf && !is_array($system_conf->billing)) {
-            $system_conf->billing = array(
-                'month_price' => 5,
-                'year_price' => 50,
-            );
-            $system_conf->save();
+        // Get a Flus subscription account id for validated users who don't
+        // have one yet.
+        $no_account = $user_conf->subscription['account_id'] === null;
+        $email_validated = $user_conf->email_validation_token !== '';
+        if ($no_account && $email_validated) {
+            $flus_private_key = FreshRSS_Context::$system_conf->billing['flus_private_key'];
+            $subscriptions_service = new \Flus\services\Subscriptions($flus_private_key);
+            $account = $subscriptions_service->getAccount($user_conf->mail_login);
+
+            if ($account) {
+                $user_conf->subscription = [
+                    'account_id' => $account['id'],
+                    'expired_at' => $account['expired_at'],
+                ];
+                $user_conf->save();
+            } else {
+                Minz_Log::error("Can’t get a Flus account_id for {$user_conf->mail_login}!");
+            }
         }
     }
 
