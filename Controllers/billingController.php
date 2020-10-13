@@ -51,4 +51,36 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
             $this->view->subscription_end_is_soon = false;
         }
     }
+
+    public function redirectAction()
+    {
+        if (!FreshRSS_Auth::hasAccess()) {
+            Minz_Error::error(403);
+        }
+
+        $user_conf = FreshRSS_Context::$user_conf;
+        $subscription = $user_conf->subscription;
+        if (empty($subscription['account_id'])) {
+            Minz_Log::error("Le compte de paiement de {$user_conf->mail_login} n’a pas été initialisé.");
+            return Minz_Request::bad('Votre compte de paiement n’a pas encore été initialisé.', [
+                'c' => 'billing',
+                'a' => 'index',
+            ], true);
+        }
+
+        $flus_private_key = FreshRSS_Context::$system_conf->billing['flus_private_key'];
+        $subscriptions_service = new \Flus\services\Subscriptions($flus_private_key);
+        $account_id = $subscription['account_id'];
+
+        $response = $subscriptions_service->loginUrl($account_id);
+        if ($response) {
+            return Minz_Request::forward($response['url'], true);
+        } else {
+            Minz_Log::error("Une erreur est survenue lors de la connexion du compte de paiement {$account_id}.");
+            return Minz_Request::bad('Une erreur est survenue lors de la connexion au compte de paiement.', [
+                'c' => 'billing',
+                'a' => 'index',
+            ], true);
+        }
+    }
 }

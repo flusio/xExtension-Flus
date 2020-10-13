@@ -16,4 +16,16 @@
             Votre abonnement se termine <strong>le <?php echo $this->expired_at_label; ?>.</strong>
         <?php } ?>
     </p>
+
+    <p>
+        <?php if ($this->subscription_end_is_soon) { ?>
+            <a class="btn btn-important" href="<?= _url('billing', 'redirect') ?>" target="_blank" rel="noopener noreferrer">
+                Renouveler depuis votre compte de paiement
+            </a>
+        <?php } else { ?>
+            <a class="btn" href="<?= _url('billing', 'redirect') ?>" target="_blank" rel="noopener noreferrer">
+                Renouveler depuis votre compte de paiement
+            </a>
+        <?php } ?>
+    </p>
 </div>
