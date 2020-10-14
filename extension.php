@@ -47,6 +47,7 @@ class FlusExtension extends Minz_Extension {
         $this->registerHook('menu_configuration_entry', array('FlusExtension', 'getMenuEntry'));
         $this->registerHook('menu_other_entry', array('FlusExtension', 'getSupportEntry'));
         $this->registerHook('freshrss_init', array('FlusExtension', 'initBillingConfiguration'));
+        $this->registerHook('freshrss_init', array('FlusExtension', 'syncIfOverdue'));
         $this->registerHook('freshrss_init', array('FlusExtension', 'blockIfOverdue'));
 
         require(__DIR__ . '/autoload.php');
@@ -116,6 +117,45 @@ class FlusExtension extends Minz_Extension {
                 Minz_Log::error("Can’t get a Flus account_id for {$user_conf->mail_login}!");
             }
         }
+    }
+
+    public static function syncIfOverdue() {
+        if (!FreshRSS_Auth::hasAccess()) {
+            return;
+        }
+
+        $user_conf = FreshRSS_Context::$user_conf;
+        if (!$user_conf) {
+            return;
+        }
+
+        $today = new \DateTime();
+        $subscription = $user_conf->subscription;
+        $expired_at = date_create_from_format('Y-m-d H:i:sP', $subscription['expired_at']);
+
+        $free_account = $expired_at->getTimestamp() === 0;
+        if ($free_account) {
+            return;
+        }
+
+        $subscription_is_overdue = $today >= $expired_at;
+        if (!$subscription_is_overdue) {
+            return;
+        }
+
+        $flus_private_key = FreshRSS_Context::$system_conf->billing['flus_private_key'];
+        $subscriptions_service = new \Flus\services\Subscriptions($flus_private_key);
+        $account_id = $subscription['account_id'];
+
+        $expired_at = $subscriptions_service->expiredAt($account_id);
+        if (!$expired_at) {
+            Minz_Log::error("Une erreur est survenue lors de la synchronisation du compte de paiement {$account_id}.");
+            return;
+        }
+
+        $subscription['expired_at'] = $expired_at;
+        $user_conf->subscription = $subscription;
+        $user_conf->save();
     }
 
     public static function blockIfOverdue() {
