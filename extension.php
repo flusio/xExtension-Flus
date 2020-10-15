@@ -47,6 +47,7 @@ class FlusExtension extends Minz_Extension {
         $this->registerHook('menu_configuration_entry', array('FlusExtension', 'getMenuEntry'));
         $this->registerHook('menu_other_entry', array('FlusExtension', 'getSupportEntry'));
         $this->registerHook('freshrss_init', array('FlusExtension', 'initBillingConfiguration'));
+        $this->registerHook('freshrss_init', array('FlusExtension', 'syncIfOverdue'));
         $this->registerHook('freshrss_init', array('FlusExtension', 'blockIfOverdue'));
 
         require(__DIR__ . '/autoload.php');
@@ -59,7 +60,7 @@ class FlusExtension extends Minz_Extension {
             $active_class = '';
         }
         $url = _url('billing', 'index');
-        $label = 'Facturation';
+        $label = 'Abonnement Flus';
 
         return "<li class=\"item$active_class\"><a href=\"$url\">$label</a></li>";
     }
@@ -77,17 +78,7 @@ class FlusExtension extends Minz_Extension {
     }
 
     public static function initBillingConfiguration() {
-        $user_conf = FreshRSS_Context::$user_conf;
-        if ($user_conf && !is_array($user_conf->billing)) {
-            $user_conf->billing = array(
-                'subscription_end_at' => strtotime("+1 month"),
-                'subscription_frequency' => 'month',
-                'payments' => array(),
-                'reminder' => false,
-            );
-            $user_conf->save();
-        }
-
+        // Initialize the basic pricing info
         $system_conf = FreshRSS_Context::$system_conf;
         if ($system_conf && !is_array($system_conf->billing)) {
             $system_conf->billing = array(
@@ -96,6 +87,75 @@ class FlusExtension extends Minz_Extension {
             );
             $system_conf->save();
         }
+
+        // Initialize the basic subscription info for all the users
+        $user_conf = FreshRSS_Context::$user_conf;
+        if ($user_conf && !is_array($user_conf->subscription)) {
+            $user_conf->subscription = [
+                'account_id' => null,
+                'expired_at' => strtotime("+1 month"),
+            ];
+            $user_conf->save();
+        }
+
+        // Get a Flus subscription account id for validated users who don't
+        // have one yet.
+        $no_account = $user_conf->subscription['account_id'] === null;
+        $email_validated = $user_conf->email_validation_token !== '';
+        if ($no_account && $email_validated) {
+            $flus_private_key = FreshRSS_Context::$system_conf->billing['flus_private_key'];
+            $subscriptions_service = new \Flus\services\Subscriptions($flus_private_key);
+            $account = $subscriptions_service->getAccount($user_conf->mail_login);
+
+            if ($account) {
+                $user_conf->subscription = [
+                    'account_id' => $account['id'],
+                    'expired_at' => $account['expired_at'],
+                ];
+                $user_conf->save();
+            } else {
+                Minz_Log::error("Can’t get a Flus account_id for {$user_conf->mail_login}!");
+            }
+        }
+    }
+
+    public static function syncIfOverdue() {
+        if (!FreshRSS_Auth::hasAccess()) {
+            return;
+        }
+
+        $user_conf = FreshRSS_Context::$user_conf;
+        if (!$user_conf) {
+            return;
+        }
+
+        $today = new \DateTime();
+        $subscription = $user_conf->subscription;
+        $expired_at = date_create_from_format('Y-m-d H:i:sP', $subscription['expired_at']);
+
+        $free_account = $expired_at->getTimestamp() === 0;
+        if ($free_account) {
+            return;
+        }
+
+        $subscription_is_overdue = $today >= $expired_at;
+        if (!$subscription_is_overdue) {
+            return;
+        }
+
+        $flus_private_key = FreshRSS_Context::$system_conf->billing['flus_private_key'];
+        $subscriptions_service = new \Flus\services\Subscriptions($flus_private_key);
+        $account_id = $subscription['account_id'];
+
+        $expired_at = $subscriptions_service->expiredAt($account_id);
+        if (!$expired_at) {
+            Minz_Log::error("Une erreur est survenue lors de la synchronisation du compte de paiement {$account_id}.");
+            return;
+        }
+
+        $subscription['expired_at'] = $expired_at;
+        $user_conf->subscription = $subscription;
+        $user_conf->save();
     }
 
     public static function blockIfOverdue() {
@@ -110,18 +170,19 @@ class FlusExtension extends Minz_Extension {
             return;
         }
 
-        $today = time();
-        $subscription_end_at = $user_conf->billing['subscription_end_at'];
-        if ($subscription_end_at === null) {
-            // Free plan
+        $today = new \DateTime();
+        $subscription = $user_conf->subscription;
+        $expired_at = date_create_from_format('Y-m-d H:i:sP', $subscription['expired_at']);
+
+        $free_account = $expired_at->getTimestamp() === 0;
+        if ($free_account) {
             return;
         }
 
-        $subscription_is_overdue = $today >= $subscription_end_at;
+        $subscription_is_overdue = $today >= $expired_at;
         $action_is_allowed = (
             Minz_Request::is('index', 'about') ||
             Minz_Request::is('index', 'tos') ||
-            Minz_Request::is('index', 'cgv') ||
             Minz_Request::is('auth', 'logout') ||
             Minz_Request::is('feed', 'actualize') ||
             Minz_Request::controllerName() === 'billing'

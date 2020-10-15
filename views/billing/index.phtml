@@ -5,102 +5,29 @@
 ?>
 
 <div class="post">
-    <h1>Facturation</h1>
+    <h1>Votre abonnement Flus</h1>
 
     <p>
-        <?php if ($this->subscription_end_at === null) { ?>
-            Vous bénéficiez d’un <strong>abonnement gratuit</strong>, pas
-            besoin de renouveler à moins de vouloir aider le service à
-            vivre&nbsp;!
-        <?php } elseif ($this->subscription_end_at > $this->today) { ?>
-            Votre abonnement se termine <strong>le <?php echo $this->subscription_end_at_label; ?>.</strong>
+        <?php if ($this->free_account) { ?>
+            Vous bénéficiez d’un <strong>abonnement gratuit</strong>&nbsp;!&nbsp;😊
+        <?php } elseif ($this->subscription_is_overdue) { ?>
+            Votre abonnement est terminé <strong>depuis le <?php echo $this->expired_at_label; ?></strong>
+            (<a href="<?= _url('billing', 'sync') ?>">synchroniser</a>).
         <?php } else { ?>
-            Votre abonnement est terminé <strong>depuis le <?php echo $this->subscription_end_at_label; ?>.</strong>
+            Votre abonnement se termine <strong>le <?php echo $this->expired_at_label; ?></strong>
+            (<a href="<?= _url('billing', 'sync') ?>">synchroniser</a>).
         <?php } ?>
     </p>
 
-    <div>
-        <?php if ($this->waiting_payment_id) { ?>
-            <a class="btn btn-important" href="<?= _url('billing', 'check', 'id', $this->waiting_payment_id) ?>">
-                Vérifier l’état de votre paiement en attente
-            </a>
-        <?php } elseif ($this->subscription_end_is_soon) { ?>
-            <a class="btn btn-important" href="<?php echo _url('billing', 'renew'); ?>">
-                Renouveler
+    <p>
+        <?php if ($this->subscription_end_is_soon) { ?>
+            <a class="btn btn-important" href="<?= _url('billing', 'redirect') ?>" target="_blank" rel="noopener noreferrer">
+                Renouveler depuis votre compte de paiement
             </a>
         <?php } else { ?>
-            <a class="btn" href="<?php echo _url('billing', 'renew'); ?>">
-                Renouveler
+            <a class="btn" href="<?= _url('billing', 'redirect') ?>" target="_blank" rel="noopener noreferrer">
+                Renouveler depuis votre compte de paiement
             </a>
         <?php } ?>
-
-        <?php if ($this->subscription_end_at !== null) { ?>
-            <form class="form-billing-reminder" method="post" action="<?= _url('billing', 'reminder') ?>">
-                <input type="hidden" name="_csrf" value="<?php echo FreshRSS_Auth::csrfToken(); ?>" />
-                <label for="reminder" class="checkbox">
-                    <input
-                        type="checkbox"
-                        name="reminder"
-                        id="reminder"
-                        <?= $this->reminder ? 'checked' : '' ?>
-                    />
-                    Activer le rappel par courriel à l’approche de l’échéance
-                </label>
-            </form>
-        <?php } ?>
-    </div>
-
-    <?php if (!empty($this->payments)) { ?>
-        <h2>Historique des paiements</h2>
-
-        <table class="fl-payments-table">
-            <thead>
-                <tr>
-                    <th class="date">Date</th>
-                    <th class="frequency">Période</th>
-                    <th class="amount">Prix</th>
-                    <th class="status">État</th>
-                    <th class="invoice">Facture</th>
-                </th>
-            </thead>
-
-            <tbody>
-                <?php foreach ($this->payments as $payment) { ?>
-                    <tr>
-                        <td><?= timestamptodate($payment['created_at']) ?></td>
-
-                        <td>
-                            <?php if ($payment['frequency'] === 'month') { ?>
-                                1 mois
-                            <?php } else { ?>
-                                1 an
-                            <?php } ?>
-                        </td>
-
-                        <td class="numeric"><?= $payment['amount'] / 100 ?>&nbsp;€</td>
-
-                        <td>
-                            <?php if ($payment['completed_at']) { ?>
-                                payé ✔
-                            <?php } else { ?>
-                                <strong>en attente</strong>
-                            <?php } ?>
-                        </td>
-
-                        <td>
-                            <?php if ($payment['completed_at']) { ?>
-                                <a
-                                    href="<?= _url('billing', 'downloadInvoice', 'id', $payment['id']) ?>"
-                                    target="_blank"
-                                    rel="noreferrer"
-                                >
-                                    Télécharger
-                                </a>
-                            <?php } ?>
-                        </td>
-                    </tr>
-                <?php } ?>
-            </tbody>
-        </table>
-    <?php } ?>
+    </p>
 </div>

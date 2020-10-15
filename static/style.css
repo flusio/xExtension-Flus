@@ -1,17 +1,3 @@
-/* Layouts */
-.fl-layout-redirection {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-
-    font-size: 1.5rem;
-    text-align: center;
-}
-
-.fl-layout-redirection .fl-layout-container {
-    margin-top: -5rem;
-}
-
 /* Forms */
 .form-group.form-group-radios label {
     display: inline-block;
@@ -20,95 +6,12 @@
     margin-left: 1.5rem;
 }
 
-/* Billing reminder */
-.form-billing-reminder,
-.form-billing-reminder label {
-    display: inline-block;
-}
-
 /* Auth form */
 .formLogin form #use-username-info {
     width: 100%;
     margin-left: 0;
     margin-right: 0;
     padding: .5rem;
-}
-
-/* Address form */
-.fl-address-form .form-group {
-    margin-bottom: .5rem;
-}
-
-.fl-address-form input.short {
-    width: 90px;
-}
-.fl-address-form input.medium {
-    width: 206px;
-}
-
-/* Billing form */
-.fl-renew-form .form-group {
-    margin-bottom: 1rem;
-}
-
-.fl-renew-form .fl-renew-form-amount strong {
-    font-size: 1.5rem;
-    font-weight: bold;
-}
-
-.fl-renew-form .fl-renew-payment-type-group .group-name {
-    margin-top: 20px;
-}
-
-.fl-renew-form .fl-renew-payment-type-group .group-controls label {
-    text-align: center;
-}
-
-.fl-renew-form .fl-renew-payment-type-group input {
-    display: none;
-}
-.fl-renew-form .fl-renew-payment-type-group input + img {
-    border: .25rem solid transparent;
-    border-radius: .25rem;
-
-    filter: grayscale(1);
-}
-.fl-renew-form .fl-renew-payment-type-group input:checked + img {
-    border-color: #0062be;
-
-    filter: grayscale(0);
-}
-
-.fl-renew-form .fl-renew-payment-type-group .payment-type-label {
-    color: #666;
-}
-.fl-renew-form .fl-renew-payment-type-group input:checked + img + .payment-type-label {
-    color: #000;
-}
-
-.fl-renew-form .btn {
-    padding: .25rem 1.5rem;
-
-    font-size: 1rem;
-}
-
-/* Payments table */
-.fl-payments-table th {
-    text-align: left;
-}
-
-.fl-payments-table td.numeric {
-    text-align: right;
-}
-
-.fl-payments-table th,
-.fl-payments-table td {
-    padding-left: 3rem;
-    padding-right: 3rem;
-}
-.fl-payments-table th:first-child,
-.fl-payments-table td:first-child {
-    padding-left: 1rem;
 }
 
 /* Support form */
