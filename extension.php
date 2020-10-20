@@ -105,7 +105,7 @@ class FlusExtension extends Minz_Extension {
         if ($no_account && $email_validated) {
             $flus_private_key = FreshRSS_Context::$system_conf->billing['flus_private_key'];
             $subscriptions_service = new \Flus\services\Subscriptions($flus_private_key);
-            $account = $subscriptions_service->getAccount($user_conf->mail_login);
+            $account = $subscriptions_service->account($user_conf->mail_login);
 
             if ($account) {
                 $user_conf->subscription = [

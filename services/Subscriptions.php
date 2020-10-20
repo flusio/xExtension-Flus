@@ -20,24 +20,14 @@ class Subscriptions {
      * Get account information
      *
      * @param string $email
-     * @param \DateTime|null $expired_at
-     * @param boolean|null $reminder
      *
      * @return array|null
      */
-    public function getAccount($email, $expired_at = null, $reminder = null)
+    public function account($email)
     {
-        $params = [
+        return $this->get('/account', [
             'email' => $email,
-        ];
-        if ($expired_at) {
-            $params['expired_at'] = $expired_at->format('Y-m-d H:i:sP');
-        }
-        if ($reminder !== null) {
-            $params['reminder'] = $reminder;
-        }
-
-        return $this->get('/account', $params);
+        ]);
     }
 
     /**
