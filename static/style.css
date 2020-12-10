@@ -1,3 +1,14 @@
+/* Home page footer */
+.fl-page-footer {
+    text-align: center;
+}
+
+.fl-page-footer .copyright {
+    font-size: 0.9rem;
+    font-style: italic;
+    text-align: center;
+}
+
 /* Forms */
 .form-group.form-group-radios label {
     display: inline-block;

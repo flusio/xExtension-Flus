@@ -72,10 +72,4 @@ class FreshExtension_index_Controller extends FreshRSS_index_Controller {
             ));
         }
     }
-
-    public function aboutAction() {
-        $this->view->about = file_get_contents($this->extension->getPath() . '/legals/about.html');
-        $this->view->can_register = !max_registrations_reached();
-        Minz_View::prependTitle(_t('index.about.title') . ' · ');
-    }
 }
