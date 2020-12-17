@@ -41,6 +41,7 @@ class Subscriptions {
     {
         $response = $this->get('/account/login-url', [
             'account_id' => $account_id,
+            'service' => 'freshrss',
         ]);
         if ($response) {
             return $response['url'];
