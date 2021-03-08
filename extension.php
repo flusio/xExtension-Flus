@@ -43,12 +43,14 @@ class FlusExtension extends Minz_Extension {
         $this->registerController('index');
         $this->registerController('billing');
         $this->registerViews();
+        $this->registerTranslates();
 
         $this->registerHook('menu_configuration_entry', array('FlusExtension', 'getMenuEntry'));
         $this->registerHook('menu_other_entry', array('FlusExtension', 'getSupportEntry'));
         $this->registerHook('freshrss_init', array('FlusExtension', 'initBillingConfiguration'));
         $this->registerHook('freshrss_init', array('FlusExtension', 'syncIfOverdue'));
         $this->registerHook('freshrss_init', array('FlusExtension', 'blockIfOverdue'));
+        $this->registerHook('freshrss_init', array('FlusExtension', 'registerFlusSharing'));
 
         require(__DIR__ . '/autoload.php');
     }
@@ -199,5 +201,15 @@ class FlusExtension extends Minz_Extension {
                 'a' => 'index',
             ), true);
         }
+    }
+
+    public static function registerFlusSharing() {
+        FreshRSS_Share::register([
+            'type' => 'flus',
+            'url' => 'https://app.flus.fr/links/new?url=~LINK~',
+            'transform' => array('rawurlencode'),
+            'form' => 'simple',
+            'method' => 'GET',
+        ]);
     }
 }

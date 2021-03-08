@@ -26,6 +26,11 @@ return array (
             'type' => 'print',
             'url' => null,
         ),
+        array (
+            'name' => 'Flus',
+            'type' => 'flus',
+            'url' => null,
+        ),
     ),
     'extensions_enabled' => array (
         'YouTube/PeerTube Video Feed' => true,
