@@ -91,9 +91,11 @@ class FlusExtension extends Minz_Extension {
         // Initialize the basic subscription info for all the users
         $user_conf = FreshRSS_Context::$user_conf;
         if ($user_conf && !is_array($user_conf->subscription)) {
+            $expired_at = new \DateTime();
+            $expired_at->modify('+1 month');
             $user_conf->subscription = [
                 'account_id' => null,
-                'expired_at' => strtotime("+1 month"),
+                'expired_at' => $expired_at->format('Y-m-d H:i:sP'),
             ];
             $user_conf->save();
         }
