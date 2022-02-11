@@ -2,22 +2,38 @@
 
 namespace Flus\services;
 
-class Subscriptions {
-    const API_HOST = 'https://flus.fr/api';
+/**
+ * The Subscriptions service allows to get information about a user
+ * subscription.
+ *
+ * @author  Marien Fressinaud <dev@marienfressinaud.fr>
+ * @license http://www.gnu.org/licenses/agpl-3.0.en.html AGPL
+ */
+class Subscriptions
+{
+    /** @var string */
+    private $host;
 
     /** @var string */
     private $private_key;
 
     /**
+     * @param string $host
      * @param string $private_key
      */
-    public function __construct($private_key)
+    public function __construct($host, $private_key)
     {
+        $this->host = $host;
         $this->private_key = $private_key;
+
+        $this->http = new \SpiderBits\Http();
+        $this->http->user_agent = FRESHRSS_USERAGENT;
+        $this->http->timeout = 5;
     }
 
     /**
-     * Get account information
+     * Get account information for the given email. Please always make sure the
+     * email has been validated first!
      *
      * @param string $email
      *
@@ -25,13 +41,33 @@ class Subscriptions {
      */
     public function account($email)
     {
-        return $this->get('/account', [
-            'email' => $email,
-        ]);
+        try {
+            $response = $this->http->get($this->host . '/api/account', [
+                'email' => $email,
+            ], [
+                'auth_basic' => $this->private_key . ':',
+            ]);
+        } catch (\SpiderBits\HttpError $e) {
+            \Minz_Log::error("Error while requesting a subscription account: {$e->getMessage()}");
+            return null;
+        }
+
+        if ($response->success) {
+            $data = json_decode($response->data, true);
+            if (!$data) {
+                return null;
+            }
+
+            $data['expired_at'] = date_create_from_format('Y-m-d H:i:sP', $data['expired_at']);
+            return $data;
+        } else {
+            \Minz_Log::error("Error while requesting a subscription account: error code {$response->status}");
+            return null;
+        }
     }
 
     /**
-     * Get a URL to login on Flus subscription center
+     * Get a login URL for the given account.
      *
      * @param string $account_id
      *
@@ -39,75 +75,107 @@ class Subscriptions {
      */
     public function loginUrl($account_id)
     {
-        $response = $this->get('/account/login-url', [
-            'account_id' => $account_id,
-            'service' => 'freshrss',
-        ]);
-        if ($response) {
-            return $response['url'];
+        try {
+            $response = $this->http->get($this->host . '/api/account/login-url', [
+                'account_id' => $account_id,
+                'service' => 'freshrss',
+            ], [
+                'auth_basic' => $this->private_key . ':',
+            ]);
+        } catch (\SpiderBits\HttpError $e) {
+            \Minz_Log::error("Error while requesting a subscription login URL: {$e->getMessage()}");
+            return null;
+        }
+
+        if ($response->success) {
+            $data = json_decode($response->data, true);
+            if (!$data) {
+                return null;
+            }
+
+            return $data['url'];
         } else {
+            \Minz_Log::error("Error while requesting a subscription login URL: error code {$response->status}");
             return null;
         }
     }
 
     /**
-     * Get the expiration date for a given account
+     * Get the expired_at value for the given account.
      *
      * @param string $account_id
      *
-     * @return string|null
+     * @return \DateTime|null
      */
     public function expiredAt($account_id)
     {
-        $response = $this->get('/account/expired-at', [
-            'account_id' => $account_id,
-        ]);
-        if ($response) {
-            return $response['expired_at'];
+        try {
+            $response = $this->http->get($this->host . '/api/account/expired-at', [
+                'account_id' => $account_id,
+            ], [
+                'auth_basic' => $this->private_key . ':',
+            ]);
+        } catch (\SpiderBits\HttpError $e) {
+            \Minz_Log::error("Error while requesting a subscription expiration date: {$e->getMessage()}");
+            return null;
+        }
+
+        if ($response->success) {
+            $data = json_decode($response->data, true);
+            if (!$data) {
+                \Minz_Log::error("Error while requesting a subscription expiration date: can’t parse the response data");
+                return null;
+            }
+
+            return date_create_from_format('Y-m-d H:i:sP', $data['expired_at']);
         } else {
+            \Minz_Log::error("Error while requesting a subscription expiration date: error code {$response->status}");
             return null;
         }
     }
 
     /**
-     * @param string $endpoint
-     * @param mixed[] $params
+     * Get the expired_at value for the given accounts.
      *
-     * @return array|null
+     * @param string[] $account_ids
+     *
+     * @return \DateTime[]|null
      */
-    private function get($endpoint, $params = [])
+    public function sync($account_ids)
     {
-        $url = self::API_HOST . $endpoint;
-        if ($params) {
-            $url = $url . '?' . http_build_query($params);
-        }
-
-        $curl_session = curl_init();
-        curl_setopt($curl_session, CURLOPT_URL, $url);
-        curl_setopt($curl_session, CURLOPT_HEADER, false);
-        curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl_session, CURLOPT_TIMEOUT, 5);
-        curl_setopt($curl_session, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-        curl_setopt($curl_session, CURLOPT_USERPWD, $this->private_key . ':');
-
-        $result = curl_exec($curl_session);
-        $http_code = curl_getinfo($curl_session, CURLINFO_RESPONSE_CODE);
-
-        if ($result === false) {
-            $error = curl_error($curl_session);
-            \Minz_Log::error("services/Subscriptions#get {$endpoint} failed: {$error}.");
-        }
-
-        if ($http_code < 200 || $http_code >= 300) {
-            \Minz_Log::error("services/Subscriptions#get {$endpoint} failed, HTTP code {$http_code}.");
-        }
-
-        curl_close($curl_session);
-
-        if ($result !== false) {
-            return json_decode($result, true);
-        } else {
+        try {
+            $response = $this->http->post($this->host . '/api/accounts/sync', [
+                'account_ids' => json_encode($account_ids),
+            ], [
+                'auth_basic' => $this->private_key . ':',
+            ]);
+        } catch (\SpiderBits\HttpError $e) {
+            \Minz_Log::error("Error while syncing subscriptions: {$e->getMessage()}");
             return null;
         }
+
+        if (!$response->success) {
+            \Minz_Log::error("Error while syncing subscriptions: code {$response->status}");
+            return null;
+        }
+
+        $data = json_decode($response->data, true);
+        if (!is_array($data)) {
+            \Minz_Log::error("Error while syncing subscriptions: can’t decode data");
+            return null;
+        }
+
+        $result = [];
+        foreach ($data as $account_id => $expired_at) {
+            $expired_at = date_create_from_format('Y-m-d H:i:sP', $expired_at);
+
+            if (!$expired_at) {
+                \Minz_Log::error("Error while syncing subscriptions: can’t parse expiration date of {$account_id}");
+                continue;
+            }
+
+            $result[$account_id] = $expired_at;
+        }
+        return $result;
     }
 }

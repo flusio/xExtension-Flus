@@ -107,18 +107,17 @@ class FlusExtension extends Minz_Extension {
         $no_account = $user_conf->subscription['account_id'] === null;
         $email_validated = $user_conf->email_validation_token !== '';
         if ($no_account && $email_validated) {
+            $flus_api_host = FreshRSS_Context::$system_conf->billing['flus_api_host'];
             $flus_private_key = FreshRSS_Context::$system_conf->billing['flus_private_key'];
-            $subscriptions_service = new \Flus\services\Subscriptions($flus_private_key);
+            $subscriptions_service = new \Flus\services\Subscriptions($flus_api_host, $flus_private_key);
             $account = $subscriptions_service->account($user_conf->mail_login);
 
             if ($account) {
                 $user_conf->subscription = [
                     'account_id' => $account['id'],
-                    'expired_at' => $account['expired_at'],
+                    'expired_at' => $account['expired_at']->format('Y-m-d H:i:sP'),
                 ];
                 $user_conf->save();
-            } else {
-                Minz_Log::error("Can’t get a Flus account_id for {$user_conf->mail_login}!");
             }
         }
     }
@@ -147,17 +146,17 @@ class FlusExtension extends Minz_Extension {
             return;
         }
 
+        $flus_api_host = FreshRSS_Context::$system_conf->billing['flus_api_host'];
         $flus_private_key = FreshRSS_Context::$system_conf->billing['flus_private_key'];
-        $subscriptions_service = new \Flus\services\Subscriptions($flus_private_key);
+        $subscriptions_service = new \Flus\services\Subscriptions($flus_api_host, $flus_private_key);
         $account_id = $subscription['account_id'];
 
         $expired_at = $subscriptions_service->expiredAt($account_id);
         if (!$expired_at) {
-            Minz_Log::error("Une erreur est survenue lors de la synchronisation du compte de paiement {$account_id}.");
             return;
         }
 
-        $subscription['expired_at'] = $expired_at;
+        $subscription['expired_at'] = $expired_at->format('Y-m-d H:i:sP');
         $user_conf->subscription = $subscription;
         $user_conf->save();
     }
