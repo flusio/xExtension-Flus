@@ -139,7 +139,7 @@ class Subscriptions
      *
      * @param string[] $account_ids
      *
-     * @return \DateTime[]|null
+     * @return string[]|null
      */
     public function sync($account_ids)
     {
@@ -165,17 +165,6 @@ class Subscriptions
             return null;
         }
 
-        $result = [];
-        foreach ($data as $account_id => $expired_at) {
-            $expired_at = date_create_from_format('Y-m-d H:i:sP', $expired_at);
-
-            if (!$expired_at) {
-                \Minz_Log::error("Error while syncing subscriptions: can’t parse expiration date of {$account_id}");
-                continue;
-            }
-
-            $result[$account_id] = $expired_at;
-        }
-        return $result;
+        return $data;
     }
 }
