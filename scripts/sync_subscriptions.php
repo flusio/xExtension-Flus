@@ -45,10 +45,10 @@ foreach ($usernames as $username) {
         ];
     }
 
-    $has_account = $subscription['account_id'] !== null;
-    if ($has_account) {
-        $account_ids_to_user_confs[$subscription['account_id']] = $user_conf;
-    } else {
+    $no_account = $user_conf->subscription['account_id'] === null;
+    $email_should_be_validated = FreshRSS_Context::$system_conf->force_email_validation;
+    $email_validated = !$email_should_be_validated || $user_conf->email_validation_token !== '';
+    if ($no_account && $email_validated) {
         $account = $subscriptions_service->account($user_conf->mail_login);
         if (!$account) {
             continue;
@@ -62,6 +62,8 @@ foreach ($usernames as $username) {
         $user_conf->save();
 
         $account_ids_to_user_confs[$account['id']] = $user_conf;
+    } elseif (!$no_account) {
+        $account_ids_to_user_confs[$subscription['account_id']] = $user_conf;
     }
 }
 
