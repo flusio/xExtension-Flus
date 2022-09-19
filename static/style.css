@@ -28,9 +28,11 @@
 /* Support form */
 .fl-support-form input {
     width: 100%;
+    box-sizing: border-box;
 }
 
 .fl-support-form textarea {
     width: 100%;
     min-height: 250px;
+    box-sizing: border-box;
 }
