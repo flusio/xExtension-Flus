@@ -21,8 +21,7 @@
         <header class="fl-page-header">
             <nav>
                 <a class="fl-page-header-brand" href="<?= _url('index', 'index') ?>">
-                    <img class="fl-page-header-logo" src="<?php echo _i('icon', true); ?>" alt="" />
-                    Flus
+                    <?= FreshRSS_Context::$system_conf->logo_html ?>
                 </a>
 
                 <a href="<?= _url('auth', 'login') ?>">

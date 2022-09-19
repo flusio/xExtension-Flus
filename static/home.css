@@ -156,7 +156,7 @@ img.illustration:hover {
     text-decoration: none;
 }
 
-.fl-page-header nav .fl-page-header-logo {
+.fl-page-header nav .fl-page-header-brand img {
     max-width: 32px;
 
     vertical-align: middle;
