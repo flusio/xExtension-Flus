@@ -19,5 +19,12 @@
       htmlUrl="https://status.flus.io/"
       description="Suivi du statut du service flus.io (maintenances planifiées et incidents)"
     />
+    <outline
+      text="Flus Actualités"
+      type="rss"
+      xmlUrl="https://actu.flus.fr/feed"
+      htmlUrl="https://actu.flus.fr/"
+      description="Une nouvelle revue de presse collaborative tous les jours à 7h."
+    />
   </body>
 </opml>
