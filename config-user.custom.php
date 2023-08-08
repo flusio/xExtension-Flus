@@ -1,7 +1,7 @@
 <?php
 
 return array (
-    'theme' => 'xTheme-Flus',
+    'theme' => 'Origine',
     'content_width' => 'medium',
     'posts_per_page' => 25,
     'mark_when' => array (
