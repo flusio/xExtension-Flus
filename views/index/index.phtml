@@ -301,37 +301,22 @@
     </section>
 
     <section class="fl-section fl-section-prices">
-        <div class="fl-columns">
-            <div class="fl-column fl-column-centered">
-                <p>
-                    <strong><?= $this->month_price ?>&nbsp;€ par mois</strong><br />
-                    ou<br />
-                    <strong><?= $this->year_price ?>&nbsp;€ par an</strong><br />
-                </p>
-            </div>
+        <p class="center">
+            <strong>Un prix unique : le vôtre.</strong><br />
+            De 0 à 120 €, le prix est libre.
+        </p>
 
-            <div class="fl-column">
-                <h2>Des tarifs simples et transparents</h2>
+        <p class="center">
+            <a href="https://flus.fr/tarifs">En apprendre plus sur flus.fr.</a>
+        </p>
 
-                <p>
-                    En vous abonnant à Flus, vous payez un prix unique, au mois
-                    ou à l’année. Les tarifs restent identiques, même si vous
-                    vous abonnez à de nombreux sites.
-                </p>
-
-                <p>
-                    <a href="https://flus.fr/tarifs">En apprendre plus sur flus.fr.</a>
-                </p>
-
-                <?php if ($this->registration_opened) { ?>
-                    <p class="center">
-                        <a class="btn btn-important" href="<?= _url('auth', 'register') ?>">
-                            Inscrivez-vous, le 1<sup>er</sup> mois est gratuit
-                        </a>
-                    </p>
-                <?php } ?>
-             </div>
-        </div>
+        <?php if ($this->registration_opened) { ?>
+            <p class="center">
+                <a class="btn btn-important" href="<?= _url('auth', 'register') ?>">
+                    Inscrivez-vous, le 1<sup>er</sup> mois est gratuit
+                </a>
+            </p>
+        <?php } ?>
     </section>
 
     <section class="fl-section">
