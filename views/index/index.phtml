@@ -1,33 +1,29 @@
 <main class="fl-page fl-page-home">
-    <section class="new-flus">
-        <p>
-            Flus, c’est également une plateforme de veille tout-en-un,<br />
-            <a href="https://flus.fr">rendez-vous sur flus.fr pour en savoir plus.</a>
-        </p>
-    </section>
-
     <section class="fl-section fl-text-container">
-        <h1>Suivez l’actualité qui <em>vous</em> intéresse</h1>
+        <h1>Flus propose FreshRSS</h1>
 
         <p class="lead">
-            Abonnez-vous aux sites, blogs et podcasts que vous avez l’habitude
-            de suivre pour tous les retrouver en un seul endroit.
+            FreshRSS, un agrégateur de flux <abbr>RSS</abbr>, est le service historique proposé par Flus.
         </p>
 
-        <?php if ($this->registration_opened) { ?>
-            <p class="center">
+        <div>
+            <?php if ($this->registration_opened) { ?>
                 <a class="btn btn-important" href="<?= _url('auth', 'register') ?>">
                     Créez-vous un compte
                 </a>
-            </p>
-        <?php } else { ?>
-            <p class="center secondary">
-                Le service n’est pas ouvert.
-            </p>
-        <?php } ?>
 
-        <p class="center">
-            <a href="<?= _url('auth', 'login') ?>">Déjà un compte&nbsp;? Connectez-vous</a>
+                ou
+            <?php } ?>
+
+            <a href="<?= _url('auth', 'login') ?>">connectez-vous</a>
+        </div>
+
+        <p>
+            Le service est aujourd’hui limité à <?= $this->max_registrations ?> comptes.
+
+            <strong>
+                <a href="https://flus.fr">Rendez-vous sur flus.fr</a> pour découvrir la plateforme de veille principale proposée par Flus.
+            </strong>
         </p>
     </section>
 

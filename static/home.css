@@ -174,13 +174,3 @@ img.illustration:hover {
 .fl-text-container h3 {
     max-width: 30rem;
 }
-
-/* Misc */
-.new-flus {
-    margin-bottom: 1rem;
-    padding: 1rem;
-
-    font-size: 1.2rem;
-    font-weight: bold;
-    text-align: center;
-}
