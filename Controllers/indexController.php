@@ -32,8 +32,6 @@ class FreshExtension_index_Controller extends FreshRSS_index_Controller {
             ];
             $system_conf = FreshRSS_Context::$system_conf;
             $this->view->max_registrations = $system_conf->limits['max_registrations'];
-            $this->view->month_price = $system_conf->billing['month_price'];
-            $this->view->year_price = $system_conf->billing['year_price'];
             Minz_View::prependTitle('Suivez l’actualité qui vous intéresse · ');
         }
     }

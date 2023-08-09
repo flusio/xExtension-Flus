@@ -80,16 +80,6 @@ class FlusExtension extends Minz_Extension {
     }
 
     public static function initBillingConfiguration() {
-        // Initialize the basic pricing info
-        $system_conf = FreshRSS_Context::$system_conf;
-        if ($system_conf && !is_array($system_conf->billing)) {
-            $system_conf->billing = array(
-                'month_price' => 5,
-                'year_price' => 50,
-            );
-            $system_conf->save();
-        }
-
         // Initialize the basic subscription info for all the users
         $user_conf = FreshRSS_Context::$user_conf;
         if ($user_conf && !is_array($user_conf->subscription)) {
