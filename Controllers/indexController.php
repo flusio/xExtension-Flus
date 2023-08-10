@@ -3,11 +3,11 @@
 class FreshExtension_index_Controller extends FreshRSS_index_Controller {
     private Minz_Extension $extension;
 
-    public function init() {
+    public function init(): void {
         $this->extension = Minz_ExtensionManager::findExtension('Flus');
     }
 
-    public function indexAction() {
+    public function indexAction(): void {
         if (FreshRSS_Auth::hasAccess()) {
             $prefered_output = FreshRSS_Context::$user_conf->view_mode;
             Minz_Request::forward(array(
@@ -25,7 +25,7 @@ class FreshExtension_index_Controller extends FreshRSS_index_Controller {
         }
     }
 
-    public function supportAction() {
+    public function supportAction(): void {
         if (!FreshRSS_Auth::hasAccess()) {
             Minz_Error::error(404);
         }
