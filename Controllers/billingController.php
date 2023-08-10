@@ -68,8 +68,17 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
             ], true);
         }
 
-        $flus_api_host = FreshRSS_Context::$system_conf->billing['flus_api_host'];
-        $flus_private_key = FreshRSS_Context::$system_conf->billing['flus_private_key'];
+        $flus_api_host = FreshRSS_Context::$system_conf->billing['flus_api_host'] ?? '';
+        $flus_private_key = FreshRSS_Context::$system_conf->billing['flus_private_key'] ?? '';
+
+        if (!$flus_api_host || !$flus_private_key) {
+            Minz_Log::error('Le serveur de paiement n’a pas été correctement configuré.');
+            return Minz_Request::bad('Une erreur est survenue lors de la connexion au compte de paiement.', [
+                'c' => 'billing',
+                'a' => 'index',
+            ]);
+        }
+
         $subscriptions_service = new services\Subscriptions($flus_api_host, $flus_private_key);
         $account_id = $subscription['account_id'];
 

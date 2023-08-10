@@ -98,8 +98,13 @@ class FlusExtension extends Minz_Extension {
         $email_should_be_validated = FreshRSS_Context::$system_conf->force_email_validation;
         $email_validated = !$email_should_be_validated || $user_conf->email_validation_token !== '';
         if ($no_account && $email_validated) {
-            $flus_api_host = FreshRSS_Context::$system_conf->billing['flus_api_host'];
-            $flus_private_key = FreshRSS_Context::$system_conf->billing['flus_private_key'];
+            $flus_api_host = FreshRSS_Context::$system_conf->billing['flus_api_host'] ?? '';
+            $flus_private_key = FreshRSS_Context::$system_conf->billing['flus_private_key'] ?? '';
+
+            if (!$flus_api_host || !$flus_private_key) {
+                return;
+            }
+
             $subscriptions_service = new \Flus\services\Subscriptions($flus_api_host, $flus_private_key);
             $account = $subscriptions_service->account($user_conf->mail_login);
 
@@ -137,8 +142,13 @@ class FlusExtension extends Minz_Extension {
             return;
         }
 
-        $flus_api_host = FreshRSS_Context::$system_conf->billing['flus_api_host'];
-        $flus_private_key = FreshRSS_Context::$system_conf->billing['flus_private_key'];
+        $flus_api_host = FreshRSS_Context::$system_conf->billing['flus_api_host'] ?? '';
+        $flus_private_key = FreshRSS_Context::$system_conf->billing['flus_private_key'] ?? '';
+
+        if (!$flus_api_host || !$flus_private_key) {
+            return;
+        }
+
         $subscriptions_service = new \Flus\services\Subscriptions($flus_api_host, $flus_private_key);
         $account_id = $subscription['account_id'];
 
