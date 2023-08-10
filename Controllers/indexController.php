@@ -1,6 +1,8 @@
 <?php
 
 class FreshExtension_index_Controller extends FreshRSS_index_Controller {
+    private Minz_Extension $extension;
+
     public function init() {
         $this->extension = Minz_ExtensionManager::findExtension('Flus');
     }

@@ -17,6 +17,9 @@ class Subscriptions
     /** @var string */
     private $private_key;
 
+    /** @var \SpiderBits\Http */
+    private $http;
+
     /**
      * @param string $host
      * @param string $private_key
