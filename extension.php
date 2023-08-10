@@ -95,7 +95,7 @@ class FlusExtension extends Minz_Extension {
         // Get a Flus subscription account id for validated users who don't
         // have one yet.
         $no_account = $user_conf->subscription['account_id'] === null;
-        $email_should_be_validated = $system_conf->force_email_validation;
+        $email_should_be_validated = FreshRSS_Context::$system_conf->force_email_validation;
         $email_validated = !$email_should_be_validated || $user_conf->email_validation_token !== '';
         if ($no_account && $email_validated) {
             $flus_api_host = FreshRSS_Context::$system_conf->billing['flus_api_host'];
