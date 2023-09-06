@@ -1,14 +1,19 @@
 <?php
 
-use \Flus\services;
-use \Flus\utils;
+use Flus\services;
+use Flus\utils;
 
-class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
-    public function init() {
+class FreshExtension_billing_Controller extends FreshRSS_ActionController
+{
+    private FlusExtension $extension;
+
+    public function init(): void
+    {
         $this->extension = Minz_ExtensionManager::findExtension('Flus');
     }
 
-    public function firstAction() {
+    public function firstAction(): void
+    {
         $user_conf = FreshRSS_Context::$user_conf;
         $subscription = $user_conf->subscription;
 
@@ -30,7 +35,8 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
         }
     }
 
-    public function indexAction() {
+    public function indexAction(): void
+    {
         if (!FreshRSS_Auth::hasAccess()) {
             Minz_Error::error(403);
         }
@@ -52,7 +58,7 @@ class FreshExtension_billing_Controller extends FreshRSS_index_Controller {
         }
     }
 
-    public function redirectAction()
+    public function redirectAction(): Minz_Request
     {
         if (!FreshRSS_Auth::hasAccess()) {
             Minz_Error::error(403);

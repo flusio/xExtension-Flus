@@ -2,8 +2,10 @@
 
 namespace Flus\mailers;
 
-class Support extends \Minz_Mailer {
-    public function send_message($from, $subject, $content) {
+class Support extends \Minz_Mailer
+{
+    public function sendMessage(string $from, string $subject, string $content): bool
+    {
         $this->view->_path('index/email_support.txt');
 
         $this->view->from = $from;
@@ -16,7 +18,8 @@ class Support extends \Minz_Mailer {
         );
     }
 
-    public function send_notification($to, $subject) {
+    public function sendNotification(string $to, string $subject): bool
+    {
         $this->view->_path('index/email_notification.txt');
 
         $this->view->subject = $subject;

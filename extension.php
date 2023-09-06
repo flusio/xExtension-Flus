@@ -1,7 +1,9 @@
 <?php
 
-class FlusExtension extends Minz_Extension {
-    public function install() {
+class FlusExtension extends Minz_Extension
+{
+    public function install(): bool
+    {
         $files_to_install = array(
             '/legals/cgu.html' => DATA_PATH . '/tos.html',
             '/config-user.custom.php' => DATA_PATH . '/config-user.custom.php',
@@ -18,7 +20,8 @@ class FlusExtension extends Minz_Extension {
         return true;
     }
 
-    public function uninstall() {
+    public function uninstall(): bool
+    {
         $files_to_unlink = array(
             DATA_PATH . '/tos.html',
             DATA_PATH . '/config-user.custom.php',
@@ -36,7 +39,8 @@ class FlusExtension extends Minz_Extension {
         return true;
     }
 
-    public function init() {
+    public function init(): void
+    {
         Minz_View::appendStyle($this->getFileUrl('style.css', 'css'));
         Minz_View::appendScript($this->getFileUrl('script.js', 'js'));
 
@@ -55,7 +59,8 @@ class FlusExtension extends Minz_Extension {
         require(__DIR__ . '/autoload.php');
     }
 
-    public static function getMenuEntry() {
+    public static function getMenuEntry(): string
+    {
         if (Minz_Request::controllerName() === 'billing') {
             $active_class = ' active';
         } else {
@@ -67,7 +72,8 @@ class FlusExtension extends Minz_Extension {
         return "<li class=\"item$active_class\"><a href=\"$url\">$label</a></li>";
     }
 
-    public static function getSupportEntry() {
+    public static function getSupportEntry(): string
+    {
         if (Minz_Request::is('index', 'support')) {
             $active_class = ' active';
         } else {
@@ -79,7 +85,8 @@ class FlusExtension extends Minz_Extension {
         return "<li class=\"item$active_class\"><a href=\"$url\">$label</a></li>";
     }
 
-    public static function initBillingConfiguration() {
+    public static function initBillingConfiguration(): void
+    {
         // Initialize the basic subscription info for all the users
         $user_conf = FreshRSS_Context::$user_conf;
         if ($user_conf && !is_array($user_conf->subscription)) {
@@ -118,7 +125,8 @@ class FlusExtension extends Minz_Extension {
         }
     }
 
-    public static function syncIfOverdue() {
+    public static function syncIfOverdue(): void
+    {
         if (!FreshRSS_Auth::hasAccess()) {
             return;
         }
@@ -162,7 +170,8 @@ class FlusExtension extends Minz_Extension {
         $user_conf->save();
     }
 
-    public static function blockIfOverdue() {
+    public static function blockIfOverdue(): void
+    {
         // don't block if user is not authenticated
         if (!FreshRSS_Auth::hasAccess()) {
             return;
@@ -203,7 +212,8 @@ class FlusExtension extends Minz_Extension {
         }
     }
 
-    public static function registerFlusSharing() {
+    public static function registerFlusSharing(): void
+    {
         FreshRSS_Share::register([
             'type' => 'flus',
             'url' => 'https://app.flus.fr/links/new?url=~LINK~',

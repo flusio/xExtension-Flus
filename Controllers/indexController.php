@@ -1,13 +1,16 @@
 <?php
 
-class FreshExtension_index_Controller extends FreshRSS_index_Controller {
+class FreshExtension_index_Controller extends FreshRSS_index_Controller
+{
     private Minz_Extension $extension;
 
-    public function init(): void {
+    public function init(): void
+    {
         $this->extension = Minz_ExtensionManager::findExtension('Flus');
     }
 
-    public function indexAction(): void {
+    public function indexAction(): void
+    {
         if (FreshRSS_Auth::hasAccess()) {
             $prefered_output = FreshRSS_Context::$user_conf->view_mode;
             Minz_Request::forward(array(
@@ -25,7 +28,8 @@ class FreshExtension_index_Controller extends FreshRSS_index_Controller {
         }
     }
 
-    public function supportAction(): void {
+    public function supportAction(): void
+    {
         if (!FreshRSS_Auth::hasAccess()) {
             Minz_Error::error(404);
         }
@@ -51,8 +55,8 @@ class FreshExtension_index_Controller extends FreshRSS_index_Controller {
             }
 
             $mailer = new \Flus\mailers\Support();
-            $mailer->send_message($email, $subject, $content);
-            $mailer->send_notification($email, $subject);
+            $mailer->sendMessage($email, $subject, $content);
+            $mailer->sendNotification($email, $subject);
 
             Minz_Request::good('Votre message a bien été envoyé', array(
                 'c' => 'index',
