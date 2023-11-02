@@ -90,7 +90,8 @@ class FreshExtension_billing_Controller extends FreshRSS_ActionController
 
         $url = $subscriptions_service->loginUrl($account_id);
         if ($url) {
-            return Minz_Request::forward($url, true);
+            header('Location: ' . $url);
+            exit();
         } else {
             return Minz_Request::bad('Une erreur est survenue lors de la connexion au compte de paiement.', [
                 'c' => 'billing',
