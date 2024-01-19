@@ -15,18 +15,13 @@ require(FLUS_EXTENSION_PATH . '/../../constants.php');
 require(FLUS_EXTENSION_PATH . '/autoload.php');
 require(LIB_PATH . '/lib_rss.php');
 
-Minz_Configuration::register(
-    'system',
-    DATA_PATH . '/config.php',
-    FRESHRSS_PATH . '/config.default.php'
-);
-FreshRSS_Context::$system_conf = Minz_Configuration::get('system');
+FreshRSS_Context::initSystem();
 
-$flus_api_host = FreshRSS_Context::$system_conf->billing['flus_api_host'];
-$flus_private_key = FreshRSS_Context::$system_conf->billing['flus_private_key'];
+$flus_api_host = FreshRSS_Context::systemConf()->billing['flus_api_host'];
+$flus_private_key = FreshRSS_Context::systemConf()->billing['flus_private_key'];
 $subscriptions_service = new \Flus\services\Subscriptions($flus_api_host, $flus_private_key);
 
-$limits = FreshRSS_Context::$system_conf->limits;
+$limits = FreshRSS_Context::systemConf()->limits;
 $min_last_activity = time() - $limits['max_inactivity'];
 
 // First, make sure all users have a subscription account.
@@ -50,7 +45,7 @@ foreach ($usernames as $username) {
     }
 
     $no_account = $user_conf->subscription['account_id'] === null;
-    $email_should_be_validated = FreshRSS_Context::$system_conf->force_email_validation;
+    $email_should_be_validated = FreshRSS_Context::systemConf()->force_email_validation;
     $email_validated = !$email_should_be_validated || $user_conf->email_validation_token !== '';
     if ($no_account && $email_validated) {
         $account = $subscriptions_service->account($user_conf->mail_login);
