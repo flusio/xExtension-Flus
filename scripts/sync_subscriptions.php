@@ -46,7 +46,7 @@ foreach ($usernames as $username) {
 
     $no_account = $user_conf->subscription['account_id'] === null;
     $email_should_be_validated = FreshRSS_Context::systemConf()->force_email_validation;
-    $email_validated = !$email_should_be_validated || $user_conf->email_validation_token !== '';
+    $email_validated = !$email_should_be_validated || $user_conf->email_validation_token === '';
     if ($no_account && $email_validated) {
         $account = $subscriptions_service->account($user_conf->mail_login);
         if (!$account) {
