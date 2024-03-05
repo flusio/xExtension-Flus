@@ -77,7 +77,7 @@ if ($result === null) {
 
 foreach ($result as $account_id => $expired_at) {
     if (!isset($account_ids_to_user_confs[$account_id])) {
-        \Minz\Log::error("Subscription account {$account_id} does not exist.");
+        Minz_Log::error("Subscription account {$account_id} does not exist.");
         continue;
     }
 
@@ -93,7 +93,7 @@ foreach ($result as $account_id => $expired_at) {
     $today = new \DateTime();
     $expired_at_date = date_create_from_format('Y-m-d H:i:sP', $expired_at);
     if ($expired_at_date === false) {
-        \Minz\Log::warning("Subscription account {$account_id} has invalid expiration date ({$expired_at}).");
+        Minz_Log::warning("Subscription account {$account_id} has invalid expiration date ({$expired_at}).");
         continue;
     }
 
