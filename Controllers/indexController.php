@@ -1,8 +1,15 @@
 <?php
 
+use Flus\utils;
+
 class FreshExtension_index_Controller extends FreshRSS_index_Controller
 {
     private Minz_Extension $extension;
+
+    public function __construct()
+    {
+        parent::__construct(utils\View::class);
+    }
 
     public function init(): void
     {

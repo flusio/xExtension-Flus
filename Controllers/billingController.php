@@ -7,6 +7,11 @@ class FreshExtension_billing_Controller extends FreshRSS_ActionController
 {
     private FlusExtension $extension;
 
+    public function __construct()
+    {
+        parent::__construct(utils\View::class);
+    }
+
     public function init(): void
     {
         $this->extension = Minz_ExtensionManager::findExtension('Flus');
