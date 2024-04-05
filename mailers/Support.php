@@ -6,9 +6,13 @@ use Flus\utils;
 
 class Support extends \Minz_Mailer
 {
+    public function __construct()
+    {
+        parent::__construct(utils\View::class);
+    }
+
     public function sendMessage(string $from, string $subject, string $content): bool
     {
-        $this->view = new utils\View();
         $this->view->_path('index/email_support.txt');
 
         $this->view->from = $from;
@@ -23,7 +27,6 @@ class Support extends \Minz_Mailer
 
     public function sendNotification(string $to, string $subject): bool
     {
-        $this->view = new utils\View();
         $this->view->_path('index/email_notification.txt');
 
         $this->view->subject = $subject;
