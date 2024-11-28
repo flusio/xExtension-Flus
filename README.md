@@ -1,6 +1,6 @@
 # xExtension-Flus
 
-This repository contains the code for the FreshRSS extension behind [flus.io](https://flus.io).
+This repository contains the code for the FreshRSS extension behind [rss.flus.fr](https://rss.flus.fr).
 
 To install this extension, you must download this repository under the
 `./extensions` folder of your own FreshRSS instance.

@@ -6,25 +6,18 @@
   </head>
   <body>
     <outline
-      text="carnet de flus"
+      text="Le carnet de flus"
       type="rss"
-      xmlUrl="https://flus.io/carnet/feeds/all.atom.xml"
-      htmlUrl="https://flus.io/carnet/"
+      xmlUrl="https://flus.fr/carnet/feeds/all.atom.xml"
+      htmlUrl="https://flus.fr/carnet/"
       description="Fil d’actualités du carnet de Flus"
     />
     <outline
-      text="Statut de flus.io"
+      text="Statut de flus.fr"
       type="rss"
-      xmlUrl="https://status.flus.io/feeds/all.atom.xml"
-      htmlUrl="https://status.flus.io/"
-      description="Suivi du statut du service flus.io (maintenances planifiées et incidents)"
-    />
-    <outline
-      text="Flus Actualités"
-      type="rss"
-      xmlUrl="https://actu.flus.fr/feed"
-      htmlUrl="https://actu.flus.fr/"
-      description="Une nouvelle revue de presse collaborative tous les jours à 7h."
+      xmlUrl="https://status.flus.fr/feed"
+      htmlUrl="https://status.flus.fr/"
+      description="Suivi du statut du service flus.fr (maintenances planifiées et incidents)"
     />
   </body>
 </opml>

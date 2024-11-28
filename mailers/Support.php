@@ -20,7 +20,7 @@ class Support extends \Minz_Mailer
 
         $subject_prefix = '[' . \FreshRSS_Context::$system_conf->title . ']';
         return $this->mail(
-            'support@flus.io',
+            'support@flus.fr',
             $subject_prefix . ' ' . $subject
         );
     }
