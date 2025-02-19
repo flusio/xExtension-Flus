@@ -52,6 +52,7 @@ class FlusExtension extends Minz_Extension
         $this->registerHook('menu_configuration_entry', array('FlusExtension', 'getMenuEntry'));
         $this->registerHook('menu_other_entry', array('FlusExtension', 'getSupportEntry'));
         $this->registerHook('freshrss_init', array('FlusExtension', 'initBillingConfiguration'));
+        $this->registerHook('freshrss_init', array('FlusExtension', 'unsetDeletionNotifiedAt'));
         $this->registerHook('freshrss_init', array('FlusExtension', 'syncIfOverdue'));
         $this->registerHook('freshrss_init', array('FlusExtension', 'blockIfOverdue'));
         $this->registerHook('freshrss_init', array('FlusExtension', 'registerFlusSharing'));
@@ -87,7 +88,7 @@ class FlusExtension extends Minz_Extension
 
     public static function initBillingConfiguration(): void
     {
-        // Initialize the basic subscription info for all the users
+        // Initialize the basic subscription info for the user
         $user_conf = FreshRSS_Context::$user_conf;
         if ($user_conf && !is_array($user_conf->subscription)) {
             $expired_at = new \DateTime();
@@ -122,6 +123,17 @@ class FlusExtension extends Minz_Extension
                 ];
                 $user_conf->save();
             }
+        }
+    }
+
+    public static function unsetDeletionNotifiedAt(): void
+    {
+        $user_conf = FreshRSS_Context::$user_conf;
+        if ($user_conf && $user_conf->hasParam('deletion_notified_at')) {
+            // If the user logged in, make sure to remove the deletion
+            // notification date (because they are now active).
+            $user_conf->_param('deletion_notified_at', null);
+            $user_conf->save();
         }
     }
 

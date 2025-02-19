@@ -1,0 +1,12 @@
+Bonjour <?= $this->username ?>,
+
+Vous recevez ce courriel parce que vous n’avez pas été actif sur <?= $this->app_title ?> depuis plusieurs mois. Pour éviter de conserver des données inutilement, votre compte sera supprimé dans un mois.
+
+Si vous ne souhaitez pas le conserver, vous n’avez rien à faire.
+
+Toutefois, si vous souhaitez conserver votre compte, vous devez vous connecter à cette adresse : <?= \Minz_Url::display(absolute: true); ?>
+
+
+Cordialement,
+
+Le robot <?= $this->app_title ?>

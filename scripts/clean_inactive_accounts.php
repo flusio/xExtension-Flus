@@ -23,26 +23,23 @@ if (!FreshRSS_Context::systemConf()->force_email_validation) {
 }
 
 $usernames = listUsers();
+
+// Delete accounts inactive for +12 months
 foreach ($usernames as $username) {
     $user_conf = get_user_configuration($username);
-    if (!$user_conf) {
+    if (!$user_conf || !$user_conf->hasParam('deletion_notified_at')) {
         continue;
     }
 
-    $email_validated = $user_conf->email_validation_token === '';
-    if ($email_validated) {
-        // Email was validated, ignore this user.
+    $notified_at = \DateTime::createFromFormat('Y-m-d', $user_conf->deletion_notified_at);
+    $one_month_ago = new \DateTime('-1 month');
+
+    if ($notified_at > $one_month_ago) {
+        // We wait for 1 month after the notification to delete the account.
         continue;
     }
 
-    $last_activity = FreshRSS_UserDAO::mtime($username);
-    $six_months = strtotime('-6 months');
-    if ($last_activity >= $six_months) {
-        // User was active within the last six months, ignore them.
-        continue;
-    }
-
-    echo 'FreshRSS deleting user “', $username, "”…\n";
+    echo "FreshRSS deleting inactive user “{$username}”…\n";
 
     FreshRSS_user_Controller::deleteUser($username);
 }
