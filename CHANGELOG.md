@@ -1,5 +1,27 @@
 # Changelog of xExtension-Flus
 
+## 2025-03-08 - v1.2.0
+
+### New
+
+- Delete accounts after 1 year of inactivity ([50f876f](https://github.com/flusio/xExtension-Flus/commit/50f876f))
+
+### Improvements
+
+- Improve the home page ([539c902](https://github.com/flusio/xExtension-Flus/commit/539c902))
+
+### Documentation
+
+- Provide a changelog ([dc5553c](https://github.com/flusio/xExtension-Flus/commit/dc5553c))
+- Add more information in the README ([64b53a5](https://github.com/flusio/xExtension-Flus/commit/64b53a5), [795dcad](https://github.com/flusio/xExtension-Flus/commit/795dcad))
+
+### Developers
+
+- Provide a pull request template ([a5c5cca](https://github.com/flusio/xExtension-Flus/commit/a5c5cca))
+- Provide a make command to release a new version ([27c42d3](https://github.com/flusio/xExtension-Flus/commit/27c42d3))
+- Provide a make command to open a shell in the FRSS container ([8551f63](https://github.com/flusio/xExtension-Flus/commit/8551f63))
+- Update the copyright headers ([8f31aef](https://github.com/flusio/xExtension-Flus/commit/8f31aef))
+
 ## 2024-10-28 - v1.1.0
 
 ### New
