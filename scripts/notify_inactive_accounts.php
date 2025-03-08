@@ -1,10 +1,9 @@
 #!/bin/env php
 <?php
 
-/**
- * @author Marien Fressinaud <dev@marienfressinaud.fr>
- * @license http://www.gnu.org/licenses/agpl-3.0.en.html AGPL
- */
+// This file is part of xExtension-Flus
+// Copyright 2019-2025 Marien Fressinaud
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 if (php_sapi_name() !== 'cli') {
     die('This script must be called from command line.');

@@ -56,3 +56,7 @@ As the service requires a subscription, it provides several features as:
 - providing a page to access the subscription account on flus.fr;
 - blocking users who have no active subscriptions;
 - notifying and removing inactive users.
+
+## License
+
+xExtension-Flus is licensed under [GNU Affero General Public License v3.0 or later](/LICENSE.txt).
