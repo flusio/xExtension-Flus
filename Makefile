@@ -1,5 +1,9 @@
 .DEFAULT_GOAL := help
 
+.PHONY: sh
+sh: ## Open a shell in the FreshRSS container
+	docker exec -ti freshrss-dev sh
+
 .PHONY: release
 release: ## Release a new version (take a VERSION argument)
 ifndef VERSION
