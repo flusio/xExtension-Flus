@@ -1,5 +1,12 @@
 # Changelog of xExtension-Flus
 
+## 2025-03-19 - v1.2.1
+
+### Bug fixes
+
+- Don't change users' last activity on notification ([523af57](https://github.com/flusio/xExtension-Flus/commit/523af57))
+- Add a new line at the end of a `notify_inactive_accounts` log ([00e109d](https://github.com/flusio/xExtension-Flus/commit/00e109d))
+
 ## 2025-03-08 - v1.2.0
 
 ### New

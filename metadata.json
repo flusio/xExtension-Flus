@@ -2,7 +2,7 @@
   "name": "Flus",
   "author": "Marien Fressinaud",
   "description": "Extension to configure flus.fr service",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "entrypoint": "Flus",
   "type": "system"
 }
