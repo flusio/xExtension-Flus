@@ -53,6 +53,11 @@ foreach ($usernames as $username) {
     $user_conf->deletion_notified_at = $deletion_notified_at->format('Y-m-d');
     $user_conf->save();
 
+    // This is a bit hacky, but by saving the user conf, we changed the last
+    // activity date. This allows to reset the last activity to its previous
+    // value.
+    touch(USERS_PATH . '/' . $username . '/config.php', $last_activity);
+
     $count_notified += 1;
 
     if ($count_notified >= 20) {
