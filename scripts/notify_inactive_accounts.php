@@ -58,7 +58,7 @@ foreach ($usernames as $username) {
     if ($count_notified >= 20) {
         // Stop after 20 notified accounts so we don't send too many emails at
         // once.
-        echo 'FreshRSS stopping to notify users after 20 emails.';
+        echo "FreshRSS stopping to notify users after 20 emails.\n";
         break;
     }
 
