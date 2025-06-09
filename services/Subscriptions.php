@@ -49,7 +49,7 @@ class Subscriptions
             $response = $this->http->get($this->host . '/api/account', [
                 'email' => $email,
             ], [
-                'auth_basic' => $this->private_key . ':',
+                'auth_basic' => ':' . $this->private_key,
             ]);
         } catch (\SpiderBits\HttpError $e) {
             \Minz_Log::error("Error while requesting a subscription account: {$e->getMessage()}");
@@ -84,7 +84,7 @@ class Subscriptions
                 'account_id' => $account_id,
                 'service' => 'freshrss',
             ], [
-                'auth_basic' => $this->private_key . ':',
+                'auth_basic' => ':' . $this->private_key,
             ]);
         } catch (\SpiderBits\HttpError $e) {
             \Minz_Log::error("Error while requesting a subscription login URL: {$e->getMessage()}");
@@ -117,7 +117,7 @@ class Subscriptions
             $response = $this->http->get($this->host . '/api/account/expired-at', [
                 'account_id' => $account_id,
             ], [
-                'auth_basic' => $this->private_key . ':',
+                'auth_basic' => ':' . $this->private_key,
             ]);
         } catch (\SpiderBits\HttpError $e) {
             \Minz_Log::error("Error while requesting a subscription expiration date: {$e->getMessage()}");
@@ -151,7 +151,7 @@ class Subscriptions
             $response = $this->http->post($this->host . '/api/accounts/sync', [
                 'account_ids' => json_encode($account_ids),
             ], [
-                'auth_basic' => $this->private_key . ':',
+                'auth_basic' => ':' . $this->private_key,
             ]);
         } catch (\SpiderBits\HttpError $e) {
             \Minz_Log::error("Error while syncing subscriptions: {$e->getMessage()}");
