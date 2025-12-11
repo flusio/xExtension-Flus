@@ -1,4 +1,10 @@
-<div class="content medium">
+<?php
+    if (FreshRSS_Auth::hasAccess()) {
+        $this->partial('aside_configure');
+    }
+?>
+
+<div class="post content">
     <a href="<?= _url('index', 'index'); ?>">
         <?= _t('gen.action.back_to_rss_feeds'); ?>
     </a>
