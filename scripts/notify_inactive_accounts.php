@@ -23,13 +23,13 @@ if (!FreshRSS_Context::systemConf()->force_email_validation) {
 
 \Minz_View::addBasePathname(FLUS_EXTENSION_PATH);
 
-$usernames = listUsers();
+$usernames = FreshRSS_user_Controller::listUsers();
 
 $count_notified = 0;
 
 // Notify accounts inactive for +12 months
 foreach ($usernames as $username) {
-    $user_conf = get_user_configuration($username);
+    $user_conf = FreshRSS_UserConfiguration::getForUser($username);
     if (!$user_conf) {
         continue;
     }

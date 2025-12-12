@@ -23,9 +23,9 @@ if (!FreshRSS_Context::systemConf()->force_email_validation) {
 
 echo "email;name\n";
 
-$usernames = listUsers();
+$usernames = FreshRSS_user_Controller::listUsers();
 foreach ($usernames as $username) {
-    $user_conf = get_user_configuration($username);
+    $user_conf = FreshRSS_UserConfiguration::getForUser($username);
     if (!$user_conf) {
         continue;
     }

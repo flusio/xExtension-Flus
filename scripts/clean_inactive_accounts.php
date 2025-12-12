@@ -21,11 +21,11 @@ if (!FreshRSS_Context::systemConf()->force_email_validation) {
     return;
 }
 
-$usernames = listUsers();
+$usernames = FreshRSS_user_Controller::listUsers();
 
 // Delete accounts inactive for +12 months
 foreach ($usernames as $username) {
-    $user_conf = get_user_configuration($username);
+    $user_conf = FreshRSS_UserConfiguration::getForUser($username);
     if (!$user_conf || !$user_conf->hasParam('deletion_notified_at')) {
         continue;
     }

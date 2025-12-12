@@ -24,11 +24,11 @@ $limits = FreshRSS_Context::systemConf()->limits;
 $min_last_activity = time() - $limits['max_inactivity'];
 
 // First, make sure all users have a subscription account.
-$usernames = listUsers();
+$usernames = FreshRSS_user_Controller::listUsers();
 $account_ids_to_user_confs = [];
 $account_ids_to_usernames = [];
 foreach ($usernames as $username) {
-    $user_conf = get_user_configuration($username);
+    $user_conf = FreshRSS_UserConfiguration::getForUser($username);
     if (!$user_conf) {
         continue;
     }
