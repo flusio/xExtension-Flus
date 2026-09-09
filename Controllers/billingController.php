@@ -38,10 +38,6 @@ class FreshExtension_billing_Controller extends FreshRSS_ActionController
         $this->view->expired_at = $expired_at;
         $this->view->free_account = $free_account;
         $this->view->subscription_is_overdue = $subscription_is_overdue;
-
-        if ($subscription_is_overdue) {
-            $this->view->_layout('simple');
-        }
     }
 
     public function indexAction(): void
